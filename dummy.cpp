@@ -1,93 +1,112 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   dummy.cpp                                          :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: cmeng <cmeng@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/23 04:09:35 by cmeng             #+#    #+#             */
-/*   Updated: 2024/01/23 04:15:02 by cmeng            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-// g++ -std=c++98 dummy.cpp -o server
-
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
-#include <unistd.h>
-
-#include <cstring>
 #include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <poll.h>
 
-const int PORT_NUMBER = 1234;  // Choose a port number
+#define MAX_CLIENTS 10
+#define BUFFER_SIZE 1024
+#define PORT 8080
 
-int main() {
-    // Step 1: Create a socket
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (serverSocket == -1) {
-        perror("Error creating socket");
-        return 1;
-    }
+int main()
+{
+	int server_fd, new_socket;
+	struct sockaddr_in address;
+	int opt = 1;
+	int addrlen = sizeof(address);
+	char buffer[BUFFER_SIZE] = {0};
 
-    // Step 2: Set up server address
-    sockaddr_in serverAddr;
-    memset(&serverAddr, 0, sizeof(serverAddr));
+	// Creating socket file descriptor
+	if((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
+	{
+		perror("socket failed");
+		exit(EXIT_FAILURE);
+	}
 
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_port = htons(PORT_NUMBER);
+	// Forcefully attaching socket to the port
+	if(setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)))
+	{
+		perror("setsockopt");
+		exit(EXIT_FAILURE);
+	}
 
-    // Step 3: Bind the socket to the address
-    if (bind(serverSocket, reinterpret_cast<sockaddr*>(&serverAddr), sizeof(serverAddr)) == -1) {
-        perror("Error binding socket");
-        close(serverSocket);
-        return 1;
-    }
+	address.sin_family = AF_INET;
+	address.sin_addr.s_addr = INADDR_ANY;
+	address.sin_port = htons(PORT);
 
-    // Step 4: Listen for incoming connections
-    if (listen(serverSocket, 10) == -1) {
-        perror("Error listening for connections");
-        close(serverSocket);
-        return 1;
-    }
+	// Binding the socket to the port
+	if(bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
+	{
+		perror("bind failed");
+		exit(EXIT_FAILURE);
+	}
 
-    std::cout << "Server listening on port " << PORT_NUMBER << std::endl;
+	if(listen(server_fd, 3) < 0)
+	{
+		perror("listen");
+		exit(EXIT_FAILURE);
+	}
 
-    // Step 5: Accept incoming connections
-    sockaddr_in clientAddr;
-    socklen_t clientAddrLen = sizeof(clientAddr);
+	// Set the server socket to non-blocking
+	fcntl(server_fd, F_SETFL, O_NONBLOCK);
 
-    int clientSocket = accept(serverSocket, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrLen);
-    if (clientSocket == -1) {
-        perror("Error accepting connection");
-        close(serverSocket);
-        return 1;
-    }
+	struct pollfd client_fds[MAX_CLIENTS];
+	int nfds = 1;
 
-    char clientIP[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &(clientAddr.sin_addr), clientIP, INET_ADDRSTRLEN);
+	client_fds[0].fd = server_fd;
+	client_fds[0].events = POLLIN;
 
-    std::cout << "Connection accepted from " << clientIP << std::endl;
+	std::cout << "server listening on port " << PORT << std::endl;
 
-    std::cout << "Connection accepted from " << inet_ntoa(clientAddr.sin_addr) << std::endl;
+	while (true)
+	{
+		int ret = poll(client_fds, nfds, -1);
 
-    // Step 6: Echo back any data received
-    char buffer[1024];
-    ssize_t bytesRead;
+		if(ret < 0)
+		{
+			perror("poll");
+			exit(EXIT_FAILURE);
+		}
 
-    while ((bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0)) > 0) {
-        // Echo back the data
-        send(clientSocket, buffer, bytesRead, 0);
-    }
+		// Check for an incoming connection
+		if(client_fds[0].revents & POLLIN)
+		{
+			if((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
+			{
+				perror("accept");
+				exit(EXIT_FAILURE);
+			}
 
-    if (bytesRead == -1) {
-        perror("Error receiving data");
-    }
+			// Set the new socket to non-blocking
+			fcntl(new_socket, F_SETFL, O_NONBLOCK);
 
-    // Step 7: Close the sockets
-    close(clientSocket);
-    close(serverSocket);
+			std::cout << "new client connected " << new_socket << std::endl;
 
-    return 0;
+			// Add the new socket to the array
+			client_fds[nfds].fd = new_socket;
+			client_fds[nfds].events = POLLIN;
+			nfds++;
+		}
+
+		// Check each client for data
+		for (int i = 1; i < nfds; i++)
+		{
+			if(client_fds[i].revents & POLLIN)
+			{
+				memset(buffer, 0, BUFFER_SIZE); // Clear the buffer
+                size_t valread = recv(client_fds[i].fd, buffer, BUFFER_SIZE - 1, 0);
+				if(valread < 0)
+				{
+					// Handle errors (e.g., client disconnection)
+				}
+				else
+				{
+					std::cout << "client " << client_fds[i].fd << ": " << buffer;
+				}
+			}
+		}
+	}
+
+	return 0;
 }
