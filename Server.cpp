@@ -116,7 +116,6 @@ void Server::runServer(void)
 				send(client.fd, "First message\r\n", 16, 0);
 				test++;
 			}
-
 		}
 	}
 }

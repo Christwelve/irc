@@ -2,9 +2,9 @@
 #ifndef IRCERROR_HPP
 # define IRCERROR_HPP
 
-#include <exception>
-#include <string>
-#include <cstring>
+# include <exception>
+# include <string>
+# include <cstring>
 
 # define RED "\033[1;31m"
 # define GREEN "\033[1;32m"
@@ -31,4 +31,4 @@ class IRCError: public std::exception
 };
 
 
-#endif 
+#endif
