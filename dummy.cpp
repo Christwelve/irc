@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <poll.h>
+#include <vector>
 
 #define MAX_CLIENTS 10
 #define BUFFER_SIZE 1024
@@ -11,6 +12,8 @@
 
 int main()
 {
+	signal(SIGPIPE, SIG_IGN);
+
 	int server_fd, new_socket;
 	struct sockaddr_in address;
 	int opt = 1;
@@ -51,17 +54,18 @@ int main()
 	// Set the server socket to non-blocking
 	fcntl(server_fd, F_SETFL, O_NONBLOCK);
 
-	struct pollfd client_fds[MAX_CLIENTS];
-	int nfds = 1;
+	std::vector<struct pollfd> clients;
 
-	client_fds[0].fd = server_fd;
-	client_fds[0].events = POLLIN;
+	struct pollfd server = {server_fd, POLLIN, 0};
+	clients.push_back(server);
+
 
 	std::cout << "server listening on port " << PORT << std::endl;
 
 	while (true)
 	{
-		int ret = poll(client_fds, nfds, -1);
+		struct pollfd *fds = &clients.at(0);
+		int ret = poll(fds, clients.size(), -1);
 
 		if(ret < 0)
 		{
@@ -70,7 +74,7 @@ int main()
 		}
 
 		// Check for an incoming connection
-		if(client_fds[0].revents & POLLIN)
+		if(clients.at(0).revents & POLLIN)
 		{
 			if((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0)
 			{
@@ -84,31 +88,40 @@ int main()
 			std::cout << "new client connected " << new_socket << std::endl;
 
 			// Add the new socket to the array
-			client_fds[nfds].fd = new_socket;
-			client_fds[nfds].events = POLLIN;
-			nfds++;
+			struct pollfd new_client = {new_socket, POLLIN | POLLOUT, 0};
+			clients.push_back(new_client);
 		}
 
 		// Check each client for data
-		for (int i = 1; i < nfds; i++)
+		for (unsigned long i = 1; i < clients.size(); i++)
 		{
-			if(client_fds[i].revents & POLLIN)
+			struct pollfd client = clients.at(i);
+
+			if(client.revents & POLLIN)
 			{
 				memset(buffer, 0, BUFFER_SIZE); // Clear the buffer
-				ssize_t valread = recv(client_fds[i].fd, buffer, BUFFER_SIZE - 1, 0);
+				ssize_t valread = recv(client.fd, buffer, BUFFER_SIZE - 1, 0);
 
 				if(valread < 0)
 				{
 					// Handle errors (e.g., client disconnection)
 				}
+				else if(valread == 0)
+				{
+					// Handle client disconnection
+					std::cout << "client " << client.fd << " disconnected" << std::endl;
+					close(client.fd);
+					clients.erase(clients.begin() + i);
+					i--;
+				}
 				else
 				{
-					std::cout << "client " << client_fds[i].fd << ": " << buffer;
+					std::cout << "client " << client.fd << ": " << buffer;
 				}
 			}
-			else if(client_fds[i].revents & POLLOUT)
+			else if(client.revents & POLLOUT)
 			{
-				send(client_fds[i].fd, "hello\r\n", 7, 0);
+				send(client.fd, "hello\r\n", 7, 0);
 			}
 
 		}
