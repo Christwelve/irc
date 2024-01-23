@@ -95,7 +95,8 @@ int main()
 			if(client_fds[i].revents & POLLIN)
 			{
 				memset(buffer, 0, BUFFER_SIZE); // Clear the buffer
-                size_t valread = recv(client_fds[i].fd, buffer, BUFFER_SIZE - 1, 0);
+				ssize_t valread = recv(client_fds[i].fd, buffer, BUFFER_SIZE - 1, 0);
+
 				if(valread < 0)
 				{
 					// Handle errors (e.g., client disconnection)
@@ -105,6 +106,11 @@ int main()
 					std::cout << "client " << client_fds[i].fd << ": " << buffer;
 				}
 			}
+			else if(client_fds[i].revents & POLLOUT)
+			{
+				send(client_fds[i].fd, "hello\r\n", 7, 0);
+			}
+
 		}
 	}
 
