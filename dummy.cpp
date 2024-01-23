@@ -5,10 +5,26 @@
 #include <unistd.h>
 #include <poll.h>
 #include <vector>
+#include <signal.h>
 
-#define MAX_CLIENTS 10
+// #define MAX_CLIENTS 10
 #define BUFFER_SIZE 1024
 #define PORT 8080
+
+
+// signal(SIGINT, shutdown_server(server_fd, clients));
+void shutdownServer(int server_fd, std::vector<struct pollfd> clients)
+{
+
+	while (clients.at(0).revents & POLLIN) 
+		close(clients.at(0).fd);
+	for (unsigned long i = 1; i < clients.size(); i++)
+	{
+		close(clients.at(i).fd);
+	}
+	close(server_fd);
+	exit(EXIT_SUCCESS);
+} 
 
 int main()
 {
