@@ -5,7 +5,7 @@
 
 int parsing(int argc, char **argv) {
 	if (argc != 3)
-		throw IRCError("Useage: ./irc <port> <password>");
+		throw IRCError("Usage: ./irc <port> <password>");
 
 	std::stringstream ss(argv[1]);
 	int port;
