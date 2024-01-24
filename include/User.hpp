@@ -2,12 +2,13 @@
 # define USER_HPP
 
 # include <string>
+# include "Socket.hpp"
 
 class User
 {
 	private:
 
-		int socket_fd_;
+		Socket socket_;
 
 		bool is_approved_;
 		bool is_registered_;
@@ -24,7 +25,7 @@ class User
 		User &operator=(const User &user);
 		~User();
 
-		int getSocketFd(void) const;
+		int getSocket(void) const;
 
 		bool isApproved(void) const;
 		bool isRegistered(void) const;

@@ -26,6 +26,7 @@ class Socket
 		int getFd(void) const;
 		struct sockaddr_in *getAddress(void) const;
 		struct pollfd &getPollFd(void) const;
+		void setState(short state);
 
 		bool hasPollIn(void) const;
 		bool hasPollOut(void) const;

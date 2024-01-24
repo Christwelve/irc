@@ -5,7 +5,6 @@
 
 Socket::Socket(void)
 {
-
 	fd_ = -1;
 	isServer_ = false;
 	memset(&pollfd_, 0, sizeof(pollfd_));
@@ -30,7 +29,7 @@ Socket::Socket(int port)
 	if(bind(fd_, (struct sockaddr *)&address_, sizeof(address_)) == -1)
 		throw IRCError("Failed to bind socket to port");
 
-	if(listen(fd_, -1) == -1)
+	if(listen(fd_, 3) == -1)
 		throw IRCError("Failed to listen on socket");
 
 	fcntl(fd_, F_SETFL, O_NONBLOCK);
@@ -98,19 +97,24 @@ struct pollfd &Socket::getPollFd(void) const
 	return ((struct pollfd &) pollfd_);
 }
 
+void Socket::setState(short state)
+{
+	pollfd_.revents = state;
+}
+
 bool Socket::hasPollIn(void) const
 {
-	return (pollfd_.revents & POLLIN);
+	return (!!(pollfd_.revents & POLLIN));
 }
 
 bool Socket::hasPollOut(void) const
 {
-	return (pollfd_.revents & POLLOUT);
+	return (!!(pollfd_.revents & POLLOUT));
 }
 
 bool Socket::hasPollErr(void) const
 {
-	return (pollfd_.revents & POLLERR);
+	return (!!(pollfd_.revents & POLLERR));
 }
 
 void Socket::send(const std::string &msg)

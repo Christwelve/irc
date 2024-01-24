@@ -27,22 +27,28 @@ void Server::runServer(void)
 
 	while (running_)
 	{
-		// redo this because poll modifies the struct but there is no reference to the struct in the socket, so my fancy functions don't work
 		struct pollfd *fds = new struct pollfd[clients_.size() + 1];
 		fds[0] = socket_.getPollFd();
+
 		for (unsigned long i = 0; i < clients_.size(); i++)
 			fds[i + 1] = clients_.at(i).getPollFd();
-		int ret = poll(fds, clients_.size(), -1);
+
+		int ret = poll(fds, clients_.size() + 1, -1);
 
 		if(ret < 0)
 			throw IRCError("Failed to poll sockets");
 
+		socket_.setState(fds[0].revents);
+		for (unsigned long i = 0; i < clients_.size(); i++)
+			clients_.at(i).setState(fds[i + 1].revents);
 
-		// Check for an incoming connection
+		delete[] fds;
+
+		listenForNewClients();
 
 
 		// Check each client for data
-		for (unsigned long i = 1; i < clients_.size(); i++)
+		for (unsigned long i = 0; i < clients_.size(); i++)
 		{
 			Socket client = clients_.at(i);
 
@@ -75,7 +81,7 @@ void Server::runServer(void)
 					}
 				}
 			}
-			else if(client.hasPollOut() && test == 0)
+			if(client.hasPollOut() && test == 0)
 			{
 				client.send("First message");
 				test = 1;
@@ -100,6 +106,8 @@ void Server::shutdownServer(void)
 {
 	std::cout << std::endl << "Shutting down server..." << std::endl;
 
+	running_ = false;
+
 	while(socket_.hasPollIn())
 	{
 		Socket new_client(socket_.getFd(), socket_.getAddress());
@@ -113,8 +121,6 @@ void Server::shutdownServer(void)
 		it->send("Server shutting down");
 		it->close();
 	}
-
-	running_ = false;
 }
 void Server::signalHandler(int signal)
 {
