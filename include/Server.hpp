@@ -11,6 +11,7 @@
 # include <vector>
 # include <signal.h>
 # include <cstddef>
+# include "Socket.hpp"
 
 # define RED "\033[1;31m"
 # define GREEN "\033[1;32m"
@@ -24,20 +25,21 @@ class Server
 	public:
 		static Server &getInstance(void);
 
-		~Server();						
+		~Server();
 
-		void initServer(size_t port, const std::string &password);
+		void initServer(int port, const std::string &password);
 		void runServer(void);
 		void shutdownServer(void);
 		static void signalHandler(int signal);
 
 	private:
-		Server(void);	                        
-		size_t port_;
+		Server(void);
 		std::string password_;
-		struct sockaddr_in address_;
-		std::vector<struct pollfd> clients_;
-		char buffer_[BUFFER_SIZE];
+		Socket socket_;
+		std::vector<Socket> clients_;
+		bool running_;
+
+		void listenForNewClients(void);
 };
 
 #endif

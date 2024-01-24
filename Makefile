@@ -1,10 +1,12 @@
 CXX=c++
 CXXFLAGS=-std=c++98
 NAME=ircserv
+SRC_DIR=src
 OBJ_DIR=obj
-SRC=$(wildcard *.cpp)
-OBJ=$(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
+SRC=$(wildcard $(SRC_DIR)/*.cpp)
+OBJ=$(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 HEADERS=$(wildcard *.hpp)
+INCLUDE=-Iinclude
 
 ifndef LENIENT
 	CXXFLAGS += -Wall -Wextra -Werror -Wpedantic
@@ -16,9 +18,9 @@ endif
 
 all: $(NAME)
 
-$(OBJ_DIR)/%.o: %.cpp $(HEADERS) Makefile
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(HEADERS) Makefile
 	@mkdir -p $(dir $@)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@ $(INCLUDE)
 
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $(NAME) $^
