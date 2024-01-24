@@ -44,21 +44,21 @@ MODE <#channelname>/<nickname> <mode>
 QUIT 	->		no response
 
 NICK 	->		:NICK <old-nickname> <new-nickname>
-				:server ERR_NICKNAMEINUSE * <new-nickname> :Nickname is already in use
+			:server ERR_NICKNAMEINUSE * <new-nickname> :Nickname is already in use
 				
 USER 	->		:server 001 <nickname> :Welcome to the Internet Relay Network <nick>!<user>@<host>
 
 JOIN 	->		:Nick!User@host JOIN :#channelname
-				:server 332 <nickname> #channelname :<topic>
-				:server 353 <nickname> = #channelname :<nicknames>
+			:server 332 <nickname> #channelname :<topic>
+			:server 353 <nickname> = #channelname :<nicknames>
 
 PART 	->		:Nick!User@host PART #channelname
 
 PRIVMSG ->		:Nick!User@host PRIVMSG #channelname :<message> 
-				:server ERR_CANNOTSENDTOCHAN <nickname> #channelname :Cannot send to channel
+			:server ERR_CANNOTSENDTOCHAN <nickname> #channelname :Cannot send to channel
 
-		->		:Nick!User@host PRIVMSG <nickname> :<message>
-				:server ERR_NOSUCHNICK <nickname> :No such user
+	->		:Nick!User@host PRIVMSG <nickname> :<message>
+			:server ERR_NOSUCHNICK <nickname> :No such user
 
 KICK 	->		:Nick!User@host KICK #channelname <nickname> :<reason>
 
@@ -67,7 +67,7 @@ INVITE 	->		:Nick!User@host INVITE <nickname> :#channelname
 TOPIC 	->		:server 332 <nickname> #channelname :<topic>
 
 LIST	->		:server 322 <nickname> #channelname <user count> :<topic>
-				:server 323 <nickname> :End of LIST
+			:server 323 <nickname> :End of LIST
 
 MODE 	->		:Nick!User@host MODE #channelname :<mode>
 
