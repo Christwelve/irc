@@ -8,7 +8,7 @@ class User
 {
 	private:
 
-		Socket socket_;
+		Socket socket_fd_;
 
 		bool is_approved_;
 		bool is_registered_;
@@ -25,7 +25,7 @@ class User
 		User &operator=(const User &user);
 		~User();
 
-		int getSocket(void) const;
+		Socket getSocketFd(void) const;
 
 		bool isApproved(void) const;
 		bool isRegistered(void) const;

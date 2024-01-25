@@ -77,7 +77,7 @@ void User::appendCommandBuffer(const std::string &partial_command)
 	command_buffer_ += partial_command;
 }
 
-int User::getSocketFd(void) const
+Socket User::getSocketFd(void) const
 {
 	return (socket_fd_);
 }
