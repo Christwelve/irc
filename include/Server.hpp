@@ -39,7 +39,9 @@ class Server
 		std::vector<Socket> clients_;
 		bool running_;
 
+		void pollSockets(void);
 		void listenForNewClients(void);
+		void processClientSockets(void);
 };
 
 #endif
