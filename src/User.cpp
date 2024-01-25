@@ -1,26 +1,13 @@
 #include "User.hpp"
 
-User::User(int socket_fd): socket_fd_(socket_fd), is_approved_(false), is_registered_(false), nickname_(""), username_(""), realname_(""), command_buffer_("") {}
-
-User::User(const User &user): socket_fd_(user.socket_fd_), is_approved_(user.is_approved_), is_registered_(user.is_registered_), nickname_(user.nickname_), username_(user.username_), realname_(user.realname_), command_buffer_(user.command_buffer_) {}
-
-User &User::operator=(const User &user)
-{
-	if (this == &user)
-		return (*this);
-
-	socket_fd_ = user.socket_fd_;
-	is_approved_ = user.is_approved_;
-	is_registered_ = user.is_registered_;
-	nickname_ = user.nickname_;
-	username_ = user.username_;
-	realname_ = user.realname_;
-	command_buffer_ = user.command_buffer_;
-
-	return (*this);
-}
+User::User(const Socket &socket): socket_(socket), is_approved_(false), is_registered_(false), nickname_(""), username_(""), realname_(""), command_buffer_("") {}
 
 User::~User() {}
+
+Socket &User::getSocket(void)
+{
+	return (socket_);
+}
 
 bool User::isApproved(void) const
 {
@@ -77,7 +64,12 @@ void User::appendCommandBuffer(const std::string &partial_command)
 	command_buffer_ += partial_command;
 }
 
-Socket User::getSocketFd(void) const
+bool User::operator==(const User &user) const
 {
-	return (socket_fd_);
+	return (socket_ == user.socket_);
+}
+
+bool User::operator!=(const User &user) const
+{
+	return (socket_ != user.socket_);
 }

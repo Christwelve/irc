@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "IRCError.hpp"
+#include "UserManager.hpp"
 
 Server::Server(void)
 {
@@ -21,73 +22,29 @@ void Server::initServer(int port, const std::string &password)
 
 void Server::runServer(void)
 {
-	int test = 0;
-
 	running_ = true;
 
 	while (running_)
 	{
-		struct pollfd *fds = new struct pollfd[clients_.size() + 1];
-		fds[0] = socket_.getPollFd();
-
-		for (unsigned long i = 0; i < clients_.size(); i++)
-			fds[i + 1] = clients_.at(i).getPollFd();
-
-		int ret = poll(fds, clients_.size() + 1, -1);
-
-		if(ret < 0)
-			throw IRCError("Failed to poll sockets");
-
-		socket_.setState(fds[0].revents);
-		for (unsigned long i = 0; i < clients_.size(); i++)
-			clients_.at(i).setState(fds[i + 1].revents);
-
-		delete[] fds;
-
+		pollSockets();
 		listenForNewClients();
-
-
-		// Check each client for data
-		for (unsigned long i = 0; i < clients_.size(); i++)
-		{
-			Socket client = clients_.at(i);
-
-			if(client.hasPollIn())
-			{
-				char buffer[BUFFER_SIZE] = {0}; // Clear the buffer
-				ssize_t valread = recv(client.getFd(), buffer, BUFFER_SIZE - 1, 0);
-
-				if(valread < 0)
-				{
-					// Handle errors (e.g., client disconnection)
-				}
-				else if(valread == 0)
-				{
-					// Handle client disconnection
-					std::cout << "client " << client.getFd() << " disconnected" << std::endl;
-					client.close();
-					clients_.erase(clients_.begin() + i);
-					i--;
-				}
-				else
-				{
-					std::cout << "client " << client.getFd() << ": " << buffer;
-					std::string msg(buffer);
-
-					if(msg.find("die") != std::string::npos)
-					{
-						shutdownServer();
-						running_ = false;
-					}
-				}
-			}
-			if(client.hasPollOut() && test == 0)
-			{
-				client.send("First message");
-				test = 1;
-			}
-		}
+		processClientSockets();
 	}
+}
+
+void Server::pollSockets(void)
+{
+	UserManager &userManager = UserManager::getInstance();
+	struct pollfd *fds = userManager.getPollFdsWithServerSocket(socket_);
+
+	int pollResult = poll(fds, userManager.getUserCount() + 1, -1);
+
+	if(pollResult == -1)
+		throw IRCError("Failed to poll sockets");
+
+	userManager.setPollFdsWithServerSocket(socket_, fds);
+
+	delete[] fds;
 }
 
 void Server::listenForNewClients(void)
@@ -99,7 +56,56 @@ void Server::listenForNewClients(void)
 
 	std::cout << "new client connected " << new_client.getFd() << std::endl;
 
-	clients_.push_back(new_client);
+	UserManager::getInstance().createUserFromSocket(new_client);
+}
+
+void Server::processClientSockets(void)
+{
+	UserManager &userManager = UserManager::getInstance();
+	std::vector<User> &users = userManager.getUsers();
+
+	for (unsigned long i = 0; i < userManager.getUserCount(); i++)
+	{
+		User &user = users.at(i);
+		Socket &socket = user.getSocket();
+
+		if(socket.hasPollIn())
+		{
+			char buffer[BUFFER_SIZE] = {0}; // Clear the buffer
+			ssize_t valread = recv(socket.getFd(), buffer, BUFFER_SIZE - 1, 0);
+
+			if(valread < 0)
+			{
+				// Handle errors (e.g., socket disconnection)
+			}
+			else if(valread == 0)
+			{
+				// Handle socket disconnection
+				std::cout << "socket " << socket.getFd() << " disconnected" << std::endl;
+				userManager.removeUser(user);
+				i--;
+			}
+			else
+			{
+				std::string msg(buffer);
+				while(msg.find("\n") != std::string::npos)
+					msg.erase(msg.find("\n"));
+
+				std::cout << "socket " << socket.getFd() << ": " << msg << std::endl;
+
+				if(msg.find("die") != std::string::npos)
+				{
+					shutdownServer();
+					running_ = false;
+				}
+			}
+		}
+		if(socket.hasPollOut())
+		{
+			// client.send("First message");
+			// test = 1;
+		}
+	}
 }
 
 void Server::shutdownServer(void)

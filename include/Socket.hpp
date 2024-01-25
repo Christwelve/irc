@@ -35,6 +35,8 @@ class Socket
 		void send(const std::string &msg);
 		void close(void);
 
+		bool operator==(const Socket &socket) const;
+		bool operator!=(const Socket &socket) const;
 };
 
 #endif

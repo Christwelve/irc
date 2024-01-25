@@ -20,12 +20,10 @@ class User
 		std::string command_buffer_;
 
 	public:
-		User(int socket_fd);
-		User(const User &user);
-		User &operator=(const User &user);
+		User(const Socket &socket);
 		~User();
 
-		Socket getSocketFd(void) const;
+		Socket &getSocket(void);
 
 		bool isApproved(void) const;
 		bool isRegistered(void) const;
@@ -41,6 +39,8 @@ class User
 
 		void appendCommandBuffer(const std::string &partial_command);
 
+		bool operator==(const User &user) const;
+		bool operator!=(const User &user) const;
 };
 
 #endif
