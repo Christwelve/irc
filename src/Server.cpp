@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include "IRCError.hpp"
+#include "UserManager.hpp"
 
 Server::Server(void)
 {
@@ -33,20 +34,15 @@ void Server::runServer(void)
 
 void Server::pollSockets(void)
 {
-	struct pollfd *fds = new struct pollfd[clients_.size() + 1];
-	fds[0] = socket_.getPollFd();
+	UserManager &userManager = UserManager::getInstance();
+	struct pollfd *fds = userManager.getPollFdsWithServerSocket(socket_);
 
-	for (unsigned long i = 0; i < clients_.size(); i++)
-		fds[i + 1] = clients_.at(i).getPollFd();
+	int pollResult = poll(fds, userManager.getUserCount() + 1, -1);
 
-	int ret = poll(fds, clients_.size() + 1, -1);
-
-	if(ret < 0)
+	if(pollResult == -1)
 		throw IRCError("Failed to poll sockets");
 
-	socket_.setState(fds[0].revents);
-	for (unsigned long i = 0; i < clients_.size(); i++)
-		clients_.at(i).setState(fds[i + 1].revents);
+	userManager.setPollFdsWithServerSocket(socket_, fds);
 
 	delete[] fds;
 }
@@ -60,36 +56,42 @@ void Server::listenForNewClients(void)
 
 	std::cout << "new client connected " << new_client.getFd() << std::endl;
 
-	clients_.push_back(new_client);
+	UserManager::getInstance().createUserFromSocket(new_client);
 }
 
 void Server::processClientSockets(void)
 {
-	for (unsigned long i = 0; i < clients_.size(); i++)
-	{
-		Socket client = clients_.at(i);
+	UserManager &userManager = UserManager::getInstance();
+	std::vector<User> &users = userManager.getUsers();
 
-		if(client.hasPollIn())
+	for (unsigned long i = 0; i < userManager.getUserCount(); i++)
+	{
+		User &user = users.at(i);
+		Socket &socket = user.getSocket();
+
+		if(socket.hasPollIn())
 		{
 			char buffer[BUFFER_SIZE] = {0}; // Clear the buffer
-			ssize_t valread = recv(client.getFd(), buffer, BUFFER_SIZE - 1, 0);
+			ssize_t valread = recv(socket.getFd(), buffer, BUFFER_SIZE - 1, 0);
 
 			if(valread < 0)
 			{
-				// Handle errors (e.g., client disconnection)
+				// Handle errors (e.g., socket disconnection)
 			}
 			else if(valread == 0)
 			{
-				// Handle client disconnection
-				std::cout << "client " << client.getFd() << " disconnected" << std::endl;
-				client.close();
-				clients_.erase(clients_.begin() + i);
+				// Handle socket disconnection
+				std::cout << "socket " << socket.getFd() << " disconnected" << std::endl;
+				userManager.removeUser(user);
 				i--;
 			}
 			else
 			{
-				std::cout << "client " << client.getFd() << ": " << buffer;
 				std::string msg(buffer);
+				while(msg.find("\n") != std::string::npos)
+					msg.erase(msg.find("\n"));
+
+				std::cout << "socket " << socket.getFd() << ": " << msg << std::endl;
 
 				if(msg.find("die") != std::string::npos)
 				{
@@ -98,7 +100,7 @@ void Server::processClientSockets(void)
 				}
 			}
 		}
-		if(client.hasPollOut())
+		if(socket.hasPollOut())
 		{
 			// client.send("First message");
 			// test = 1;

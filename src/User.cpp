@@ -1,20 +1,12 @@
 #include "User.hpp"
 
-User::User(Socket *socket): socket_(socket), is_approved_(false), is_registered_(false), nickname_(""), username_(""), realname_(""), command_buffer_("") {}
+User::User(const Socket &socket): socket_(socket), is_approved_(false), is_registered_(false), nickname_(""), username_(""), realname_(""), command_buffer_("") {}
 
-User::~User()
-{
-	delete socket_;
-}
+User::~User() {}
 
-Socket *User::getSocket(void) const
+Socket &User::getSocket(void)
 {
 	return (socket_);
-}
-
-void User::setSocket(Socket *socket)
-{
-	socket_ = socket;
 }
 
 bool User::isApproved(void) const
@@ -25,11 +17,6 @@ bool User::isApproved(void) const
 bool User::isRegistered(void) const
 {
 	return (is_registered_);
-}
-
-bool User::isOnline(void) const
-{
-	return (socket_ != NULL);
 }
 
 void User::setApproved(void)
@@ -75,4 +62,14 @@ void User::setRealname(const std::string &realname)
 void User::appendCommandBuffer(const std::string &partial_command)
 {
 	command_buffer_ += partial_command;
+}
+
+bool User::operator==(const User &user) const
+{
+	return (socket_ == user.socket_);
+}
+
+bool User::operator!=(const User &user) const
+{
+	return (socket_ != user.socket_);
 }

@@ -129,3 +129,13 @@ void Socket::close(void)
 {
 	::close(fd_);
 }
+
+bool Socket::operator==(const Socket &socket) const
+{
+	return (fd_ == socket.fd_);
+}
+
+bool Socket::operator!=(const Socket &socket) const
+{
+	return (fd_ != socket.fd_);
+}

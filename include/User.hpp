@@ -8,7 +8,7 @@ class User
 {
 	private:
 
-		Socket *socket_;
+		Socket socket_;
 
 		bool is_approved_;
 		bool is_registered_;
@@ -20,15 +20,13 @@ class User
 		std::string command_buffer_;
 
 	public:
-		User(Socket *socket);
+		User(const Socket &socket);
 		~User();
 
-		Socket *getSocket(void) const;
-		void setSocket(Socket *socket);
+		Socket &getSocket(void);
 
 		bool isApproved(void) const;
 		bool isRegistered(void) const;
-		bool isOnline(void) const;
 		void setApproved(void);
 		void setRegistered(void);
 
@@ -41,6 +39,8 @@ class User
 
 		void appendCommandBuffer(const std::string &partial_command);
 
+		bool operator==(const User &user) const;
+		bool operator!=(const User &user) const;
 };
 
 #endif
