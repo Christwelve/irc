@@ -8,7 +8,7 @@ class User
 {
 	private:
 
-		Socket socket_;
+		Socket socket_fd_;
 
 		bool is_approved_;
 		bool is_registered_;
