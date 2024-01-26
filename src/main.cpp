@@ -1,8 +1,10 @@
-#include <sstream>
-#include "Server.hpp"
-#include "IRCError.hpp"
+# include "Server.hpp"
+# include "IRCError.hpp"
+# include "Parsing.hpp"
+# include "User.hpp"
+# include "Socket.hpp"
+# include <sstream>
 
-#include <string>
 
 
 int parsing(int argc, char **argv) {
@@ -37,3 +39,26 @@ int main(int argc, char **argv)
 	}
 	return (0);
 }
+
+// int main(void) {
+// 	Socket socket;
+// 	User user(socket);
+
+//     initializeCommandMap();
+
+
+//     inputParsing(user, "qUiT :quitmessage");
+//     inputParsing(user, "NICK newNickname");
+//     inputParsing(user, "USER username hostname servername :realname");
+//     inputParsing(user, "JOIN #channel");
+//     inputParsing(user, "PART #channel");
+//     inputParsing(user, "PRIVMSG receiver :message");
+//     inputParsing(user, "PRIVMSG #channel :message");
+//     inputParsing(user, "KICK #channel nickname :reason");
+//     inputParsing(user, "INVITE nickname #channel");
+//     inputParsing(user, "TOPIC #channel :newTopic");
+//     inputParsing(user, "LIST");
+//     inputParsing(user, "MODE #channel +o");
+
+//     return (0);
+// }
