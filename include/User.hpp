@@ -2,6 +2,7 @@
 # define USER_HPP
 
 # include <string>
+# include <queue>
 # include "Socket.hpp"
 
 class User
@@ -10,14 +11,15 @@ class User
 
 		Socket socket_;
 
-		bool is_approved_;
-		bool is_registered_;
+		bool isApproved_;
+		bool isRegistered_;
 
 		std::string nickname_;
 		std::string username_;
 		std::string realname_;
 
-		std::string command_buffer_;
+		std::string commandBuffer_;
+		std::queue<std::string> messageQueue_;
 
 	public:
 		User(const Socket &socket);
@@ -37,7 +39,13 @@ class User
 		void setUsername(const std::string &username);
 		void setRealname(const std::string &realname);
 
-		void appendCommandBuffer(const std::string &partial_command);
+		void appendCommandBuffer(const std::string &partialCommand);
+		void queue(const std::string &message);
+		std::string &getNextMessage(void);
+		void finishedSendingMessage(void);
+		bool hasInput(void) const;
+		bool hasOutput(void) const;
+		std::string getInputFromCommandBuffer(void);
 
 		bool operator==(const User &user) const;
 		bool operator!=(const User &user) const;

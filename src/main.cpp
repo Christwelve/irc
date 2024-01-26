@@ -6,6 +6,7 @@
 # include <sstream>
 
 
+
 int parsing(int argc, char **argv) {
 	if (argc != 3)
 		throw IRCError("Usage: ./irc <port> <password>");

@@ -15,9 +15,9 @@ void UserManager::createUserFromSocket(const Socket &socket)
 	users_.push_back(User(socket));
 }
 
-std::vector<User>::const_iterator UserManager::getUserByNickname(const std::string &nickname) const
+std::vector<User>::iterator UserManager::getUserByNickname(const std::string &nickname)
 {
-	for(std::vector<User>::const_iterator it = users_.begin(); it != users_.end(); it++)
+	for(std::vector<User>::iterator it = users_.begin(); it != users_.end(); it++)
 	{
 		if (it->getNickname() == nickname)
 			return (it);
