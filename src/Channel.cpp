@@ -1,4 +1,5 @@
-#include "../include/Channel.hpp"
+#include "Channel.hpp"
+#include "UserManager.hpp"
 
 Channel::Channel(const std::string &name)
 {
@@ -27,25 +28,23 @@ Channel::Channel(const std::string &name, const std::string &key)
 Channel::~Channel() { return; }
 
 
-
 // CONTAINER MODIFIERS
-
-void Channel::addUser(User &user)
+void Channel::addUser(const User &user)
 {
 	users_.push_back(user);
 }
 
-void Channel::addOperator(User &user)
+void Channel::addOperator(const User &user)
 {
 	operators_.push_back(user);
 }
 
-void Channel::addInvite(User &user)
+void Channel::addInvite(const User &user)
 {
 	invites_.push_back(user);
 }
 
-void Channel::removeUser(User &user)
+void Channel::removeUser(const User &user)
 {
 	for (unsigned long i = 0; i < users_.size(); i++)
 	{
@@ -58,7 +57,7 @@ void Channel::removeUser(User &user)
 	}
 }
 
-void Channel::removeOperator(User &user)
+void Channel::removeOperator(const User &user)
 {
 	for (unsigned long i = 0; i < operators_.size(); i++)
 	{
@@ -71,7 +70,7 @@ void Channel::removeOperator(User &user)
 	}
 }
 
-void Channel::removeInvite(User &user)
+void Channel::removeInvite(const User &user)
 {
 	for (unsigned long i = 0; i < invites_.size(); i++)
 	{
@@ -84,16 +83,16 @@ void Channel::removeInvite(User &user)
 	}
 }
 
-// CONTAINER GETTERS
 
+// CONTAINER GETTERS
 const std::vector<User> &Channel::getUsers(void) const { return (users_); }
 
 const std::vector<User> &Channel::getOperators(void) const { return (operators_); }
 
 const std::vector<User> &Channel::getInvites(void) const { return (invites_); }
 
-// CHANNEL MODIFIERS
 
+// CHANNEL MODIFIERS
 void Channel::setKey(const std::string &key) { key_ = key; }
 
 void Channel::setTopic(const std::string &topic) { topic_ = topic; }
@@ -108,8 +107,8 @@ void Channel::setKeyRequired(void) { k_ = true; }
 
 void Channel::setUserLimit(void) { l_ = true; }
 
-// CHANNEL GETTERS
 
+// CHANNEL GETTERS
 const std::string &Channel::getName(void) const { return (name_); }
 
 const std::string &Channel::getKey(void) const { return (key_); }
@@ -125,3 +124,14 @@ bool Channel::isTopicRestricted(void) const { return (t_); }
 bool Channel::isKeyRequired(void) const { return (k_); }
 
 bool Channel::isUserLimit(void) const { return (l_); }
+
+
+// CHANNEL MESSAGE
+void Channel::sendMessage(const User &user, const std::string &message)
+{
+	for (unsigned long i = 0; i < users_.size(); i++)
+	{
+		if (users_.at(i) != user)
+			users_.at(i).queue(message);
+	}
+}

@@ -1,6 +1,6 @@
 #include "User.hpp"
 
-User::User(const Socket &socket): socket_(socket), is_approved_(false), is_registered_(false), nickname_(""), username_(""), realname_(""), command_buffer_("") {}
+User::User(const Socket &socket): socket_(socket), isApproved_(false), isRegistered_(false), nickname_(""), username_(""), realname_(""), commandBuffer_("") {}
 
 User::~User() {}
 
@@ -11,22 +11,22 @@ Socket &User::getSocket(void)
 
 bool User::isApproved(void) const
 {
-	return (is_approved_);
+	return (isApproved_);
 }
 
 bool User::isRegistered(void) const
 {
-	return (is_registered_);
+	return (isRegistered_);
 }
 
 void User::setApproved(void)
 {
-	is_approved_ = true;
+	isApproved_ = true;
 }
 
 void User::setRegistered(void)
 {
-	is_registered_ = true;
+	isRegistered_ = true;
 }
 
 const std::string &User::getNickname(void) const
@@ -59,9 +59,56 @@ void User::setRealname(const std::string &realname)
 	realname_ = realname;
 }
 
-void User::appendCommandBuffer(const std::string &partial_command)
+void User::appendCommandBuffer(const std::string &partialCommand)
 {
-	command_buffer_ += partial_command;
+	commandBuffer_ += partialCommand;
+}
+
+void User::queue(const std::string &message)
+{
+	messageQueue_.push(message + "\r\n");
+}
+
+
+std::string &User::getNextMessage(void)
+{
+	return (messageQueue_.front());
+}
+
+void User::finishedSendingMessage(void)
+{
+	messageQueue_.pop();
+}
+
+bool User::hasInput(void) const
+{
+	if(commandBuffer_.find("\r\n") != std::string::npos)
+		return (true);
+	if(commandBuffer_.find("\n") != std::string::npos)
+		return (true);
+	return (false);
+}
+
+bool User::hasOutput(void) const
+{
+	return (!messageQueue_.empty());
+}
+
+std::string User::getInputFromCommandBuffer(void)
+{
+	std::string input = commandBuffer_;
+
+	if(input.find("\r\n") != std::string::npos)
+	{
+		input.erase(input.find("\r\n"));
+		commandBuffer_.erase(0, input.length() + 2);
+	}
+	else if(input.find("\n") != std::string::npos)
+	{
+		input.erase(input.find("\n"));
+		commandBuffer_.erase(0, input.length() + 1);
+	}
+	return (input);
 }
 
 bool User::operator==(const User &user) const

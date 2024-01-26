@@ -1,6 +1,8 @@
+#include <sstream>
 #include "Server.hpp"
 #include "IRCError.hpp"
-#include <sstream>
+
+#include <string>
 
 
 int parsing(int argc, char **argv) {
