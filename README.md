@@ -66,7 +66,7 @@ MODE <#channelname>/<nickname> <mode>
 
 # Server -> Client communication
 
-QUIT 	->		no response
+QUIT 	->		(to all other users of a channel): :Nickname!Username@hostname QUIT :Quit: quit message
 
 NICK 	->		:NICK <old-nickname> <new-nickname>
 			:server ERR_NICKNAMEINUSE * <new-nickname> :Nickname is already in use
@@ -96,6 +96,32 @@ LIST	->		:server 322 <nickname> #channelname <user count> :<topic>
 
 MODE 	->		:Nick!User@host MODE #channelname :<mode>
 
+
+
+
+:server 421 client :Unknown command
+001: Welcome message sent after a successful connection.
+002: Server's version information.
+003: Server's creation date.
+004: Server's details (name, version, available user modes, available channel modes).
+005: Additional server features.
+353: Reply to the NAMES command, listing all visible users in a channel.
+366: End of NAMES list.
+372: MOTD (Message of the Day) text line.
+375: Start of MOTD.
+376: End of MOTD.
+421: Unknown command.
+433: Nickname is already in use.
+441: User not in channel (used when trying to kick a user not in channel).
+442: Not on channel (used when trying to perform a channel operation without being on the channel).
+461: Need more parameters (used when a command needs more parameters).
+462: Already registered (used when a client tries to register again).
+464: Incorrect password.
+465: You are banned from this server.
+471: Channel is full.
+473: Invite only channel.
+474: Banned from channel.
+475: Bad channel key.
 
 
 >client 4: NICK cmeng
