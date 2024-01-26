@@ -15,23 +15,21 @@ class UserManager
 
 		std::vector<User> users_;
 
-		// std::map<const std::string, void ()>
-
 	public:
 		static UserManager &getInstance(void);
 
 		~UserManager();
 
 		void createUserFromSocket(const Socket &socket);
-		std::vector<User>::const_iterator getUserByNickname(const std::string &nickname) const;
+		std::vector<User>::iterator getUserByNickname(const std::string &nickname);
 		void deleteUserBySocket(const Socket &socket);
 
-		std::vector<User> &getUsers(void);
 		void removeUser(User &user);
 
 		struct pollfd *getPollFdsWithServerSocket(const Socket &serverSocket);
 		void setPollFdsWithServerSocket(Socket &serverSocket, struct pollfd *pollfds);
 
+		std::vector<User> &getUsers(void);
 		size_t getUserCount(void) const;
 };
 

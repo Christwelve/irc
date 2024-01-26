@@ -1,3 +1,4 @@
+#include <errno.h>
 #include "Server.hpp"
 #include "IRCError.hpp"
 #include "UserManager.hpp"
@@ -76,7 +77,9 @@ void Server::processClientSockets(void)
 
 			if(valread < 0)
 			{
-				// Handle errors (e.g., socket disconnection)
+				std::cout << "Failed to send message to socket " << socket.getFd() << std::endl;
+				userManager.removeUser(user);
+				continue;
 			}
 			else if(valread == 0)
 			{
@@ -84,16 +87,31 @@ void Server::processClientSockets(void)
 				std::cout << "socket " << socket.getFd() << " disconnected" << std::endl;
 				userManager.removeUser(user);
 				i--;
+				continue;
 			}
 			else
 			{
 				std::string msg(buffer);
-				while(msg.find("\n") != std::string::npos)
-					msg.erase(msg.find("\n"));
 
-				std::cout << "socket " << socket.getFd() << ": " << msg << std::endl;
+				user.appendCommandBuffer(msg);
 
-				if(msg.find("die") != std::string::npos)
+				if(user.hasInput())
+				{
+					std::string input = user.getInputFromCommandBuffer();
+
+					if(input.length() == 0)
+						continue;
+
+					std::cout << "received command from socket " << socket.getFd() << ": " << input << std::endl;
+					user.queue("You said: " + input);
+				}
+				else
+				{
+					std::cout << "received partial from socket " << socket.getFd() << ": " << msg << std::endl;
+				}
+
+
+				if(msg == "die")
 				{
 					shutdownServer();
 					running_ = false;
@@ -102,8 +120,26 @@ void Server::processClientSockets(void)
 		}
 		if(socket.hasPollOut())
 		{
-			// client.send("First message");
-			// test = 1;
+			if(!user.hasOutput())
+				continue;
+
+			std::string &message = user.getNextMessage();
+			errno = 0;
+			ssize_t sent = send(socket.getFd(), message.c_str(), message.length(), 0);
+
+			if(errno != EWOULDBLOCK && errno != EAGAIN && errno != 0)
+				throw IRCError("Failed to send message to socket " + std::to_string(socket.getFd()));
+
+			if(sent == -1)
+			{
+				std::cerr << "Failed to send message to socket " << socket.getFd() << std::endl;
+				userManager.removeUser(user);
+				continue;
+			}
+
+			message.erase(0, sent);
+			if(message.length() == 0)
+				user.finishedSendingMessage();
 		}
 	}
 }

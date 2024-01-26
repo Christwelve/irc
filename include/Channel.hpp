@@ -32,13 +32,13 @@ class Channel
 		Channel(const std::string &name, const std::string &key);
 		~Channel();
 
-		void addUser(User &user);
-		void addOperator(User &user);
-		void addInvite(User &user);
+		void addUser(const User &user);
+		void addOperator(const User &user);
+		void addInvite(const User &user);
 
-		void removeUser(User &user);
-		void removeOperator(User &user);
-		void removeInvite(User &user);
+		void removeUser(const User &user);
+		void removeOperator(const User &user);
+		void removeInvite(const User &user);
 
 		const std::vector<User> &getUsers(void) const;
 		const std::vector<User> &getOperators(void) const;
@@ -62,7 +62,8 @@ class Channel
 		bool isTopicRestricted(void) const;
 		bool isKeyRequired(void) const;
 		bool isUserLimit(void) const;
-		
+
+		void sendMessage(const User &user, const std::string &message);
 };
 
 
