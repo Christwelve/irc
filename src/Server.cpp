@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <sstream>
 #include "Server.hpp"
 #include "IRCError.hpp"
 #include "UserManager.hpp"
@@ -164,6 +165,7 @@ void Server::shutdownServer(void)
 		it->close();
 	}
 }
+
 void Server::signalHandler(int signal)
 {
 	(void) signal;
@@ -171,6 +173,11 @@ void Server::signalHandler(int signal)
 	Server &server = Server::getInstance();
 
 	server.shutdownServer();
+}
+
+bool Server::isPasswordValid(const std::string &password) const
+{
+	return (password == password_);
 }
 
 Server &Server::getInstance(void)

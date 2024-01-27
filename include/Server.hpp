@@ -42,6 +42,8 @@ class Server
 		void pollSockets(void);
 		void listenForNewClients(void);
 		void processClientSockets(void);
+
+		bool isPasswordValid(const std::string &password) const;
 };
 
 #endif
