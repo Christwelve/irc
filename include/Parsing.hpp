@@ -8,6 +8,8 @@
 # include "Socket.hpp"
 # include "User.hpp"
 # include "UserManager.hpp"
+# include "Message.hpp"
+# include "MessageDefines.hpp"
 
 #include <string>
 #include <map>
@@ -43,162 +45,203 @@ std::string serverToClient(User &user, int status, std::string command) {
     return statusMap[status];
 }
 
-void ping(User &user, std::vector<std::string> tokens)
+
+std::string pass(User &user, const Message &message)
 {
-	std::string out;
-	if (tokens.size() == 1)
-		out = serverToClient(user, 461, "PING"); 										//no origin specified
-	else if (tokens.size() == 2)
-		out = std::string(":") + " PONG " + SERVER_NAME + " " + tokens[1];				//pong
-	else
-		out = ":" + std::string(SERVER_NAME) + " PONG " + tokens[1] + " " + tokens[2];	//pong
-	user.queue(out);
+	if(message.getParamCount() < 1)
+		return (ERR_NEED_MORE_PARAMS(user, "PASS"));
+	if(user.isRegistered())
+		return (ERR_USER_ALREADY_REGISTERED(user));
+	if(!user.hasState(USER_EXPECTS_PASS))
+		return (ERR_UNKNOWN_COMMAND(user, "PASS"));
+	if(!Server::getInstance().isPasswordValid(message.getParamAt(0)))
+	{
+		UserManager::getInstance().removeUser(user);
+		return ("");
+	}
+
+	user.setState(USER_EXPECTS_NICK);
+
+	return ("");
 }
 
-void cap(User &user, std::vector<std::string> tokens)
+std::string ping(User &user, const Message &message)
 {
-	(void)user;
-	(void)tokens;
-	return;	
-}	
+	if (message.getParamCount() == 1)
+		return (PONG_WITH_PARAM(message));
+	if (message.hasTrailing())
+		return (PONG_WITH_TRAILING(message));
 
-void quit(User &user, std::vector<std::string> tokens)
+	return (ERR_NEED_MORE_PARAMS(user, "PING"));
+}
+
+std::string cap(User &user, const Message &message)
 {
 	(void)user;
-	std::cout << "quit() " << user.getNickname() << tokens[1] << std::endl;
+	(void)message;
+
+	return ("");
+}
+
+std::string quit(User &user, const Message &message)
+{
+	(void)user;
+	std::cout << "quit() " << user.getNickname() << message.getParamAt(0) << std::endl;
 	//sendFuntion()
 	// :nickname!username@hostname QUIT :<quit message>\r\n
-	
-}	
-	
-void nick(User &user, std::vector<std::string> tokens)
+
+	return ("");
+}
+
+std::string nick(User &user, const Message &message)
 {
-	std::string out;
-	if (!tokens[1].size()) 
-		out = serverToClient(user, 431); 												//no nickname given
-	else if (userManager.getUserByNickname(tokens[1]) != userManager.getUsers().end()) 
-		out = serverToClient(user, 433); 												//nickname already in use
-	else if (user.isRegistered()) 
+	//TODO: insert invalid characters in nickname
+
+	UserManager &userManager = UserManager::getInstance();
+
+	if (message.getParamCount() == 0)
+		return (ERR_NEED_MORE_PARAMS(user, "NICK"));
+	if (userManager.hasUserWithNickname(message.getParamAt(0)))
+		return (ERR_NICK_ALREADY_IN_USE(user, message.getParamAt(0)));
+	if (user.isRegistered())
 	{
-		out = ":" + user.getNickname() + " NICK :" + tokens[1];
-		user.setNickname(tokens[1]);													// set new nickname
-	} 
-	else 
-	{
-		userManager.createUserFromSocket(user.getSocket());
-		out = ":" + user.getNickname() + " NICK :" + tokens[1];							//create new user
+		user.setNickname(message.getParamAt(0));
+		return (NICK_CHANGED(user, message.getParamAt(0)));
 	}
-	user.queue(out);
+	if (!user.hasState(USER_EXPECTS_NICK))
+		return (ERR_UNKNOWN_COMMAND(user, "NICK"));
+
+	user.setNickname(message.getParamAt(0));
+	user.setState(USER_EXPECTS_USER);
+
+	return ("");
 }
 
-void userCmd(User &user, std::vector<std::string> tokens)
+std::string userCmd(User &user, const Message &message)
+{
+	if (message.getParamCount() < 3)
+		return (ERR_NEED_MORE_PARAMS(user, "USER"));
+	if (user.isRegistered())
+		return (ERR_USER_ALREADY_REGISTERED(user));
+	if (!user.hasState(USER_EXPECTS_USER))
+		return (ERR_UNKNOWN_COMMAND(user, "USER"));
+
+	user.setUsername(message.getParamAt(0), message.getParamAt(2));
+	user.setState(USER_REGISTERED);
+	std::cout << "user() "  << message.getParamAt(0) << message.getParamAt(1)  << message.getParamAt(2) << message.getParamAt(3) << std::endl;
+
+	return ("");
+}
+
+std::string join(User &user, const Message &message)
 {
 	(void)user;
-	std::cout << "user() "  << tokens[1] << tokens[2]  << tokens[3] << tokens[4] << std::endl;
+	std::cout << "join() " << message.getParamAt(0) << std::endl;
+
+	return ("");
 }
 
-void join(User &user, std::vector<std::string> tokens)
-{
-	(void)user;
-	std::cout << "join() " << tokens[1] << std::endl;
-}
-
-void part(User &user, std::vector<std::string> tokens)
-{
-	(void)user;
-
-	std::cout << "part() " << tokens[1] << std::endl;
-}
-
-void privmsg(User &user, std::vector<std::string> tokens)
-{
-	(void)user;
-	std::cout << "privmsg() " << tokens[1] << tokens[2] << std::endl;
-}
-
-void kick(User &user, std::vector<std::string> tokens)
-{
-	(void)user;
-	std::cout << "kick() " << tokens[1] << tokens[2] << tokens[3] << std::endl;
-}
-
-void invite(User &user, std::vector<std::string> tokens)
-{
-	(void)user;
-	std::cout << "invite() " << tokens[1] << tokens[2] << std::endl;
-}
-
-void topic(User &user, std::vector<std::string> tokens)
+std::string part(User &user, const Message &message)
 {
 	(void)user;
 
-	std::cout << "topic() " << tokens[1] << tokens[2] << std::endl;
+	std::cout << "part() " << message.getParamAt(0) << std::endl;
+
+	return ("");
 }
-void list(User &user, std::vector<std::string> tokens) 
+
+std::string privmsg(User &user, const Message &message)
 {
 	(void)user;
-	(void)tokens;
+	std::cout << "privmsg() " << message.getParamAt(0) << message.getParamAt(1) << std::endl;
+
+	return ("");
+}
+
+std::string kick(User &user, const Message &message)
+{
+	(void)user;
+	std::cout << "kick() " << message.getParamAt(0) << message.getParamAt(1) << message.getParamAt(2) << std::endl;
+
+	return ("");
+}
+
+std::string invite(User &user, const Message &message)
+{
+	(void)user;
+	std::cout << "invite() " << message.getParamAt(0) << message.getParamAt(1) << std::endl;
+
+	return ("");
+}
+
+std::string topic(User &user, const Message &message)
+{
+	(void)user;
+
+	std::cout << "topic() " << message.getParamAt(0) << message.getParamAt(1) << std::endl;
+
+	return ("");
+}
+std::string list(User &user, const Message &message)
+{
+	(void)user;
+	(void)message;
 	std::cout << "list() " << std::endl;
+
+	return ("");
 }
 
-void mode(User &user, std::vector<std::string> tokens)
+std::string mode(User &user, const Message &message)
 {
 	(void)user;
 
-	std::cout << "mode() " << tokens[1] << tokens[2] << std::endl;
+	std::cout << "mode() " << message.getParamAt(0) << message.getParamAt(1) << std::endl;
+
+	return ("");
 }
 
-typedef void (*CommandFunc)(User&, std::vector<std::string>);
-std::map<std::string, CommandFunc> commandMap;
-void initializeCommandMap() {
-	commandMap["PING"] = ping;
-	commandMap["CAP" ] = cap;
-	commandMap["QUIT"] = quit;
-	commandMap["NICK"] = nick;
-	commandMap["USER"] = userCmd;
-	commandMap["JOIN"] = join;
-	commandMap["PART"] = part;
-	commandMap["PRIVMSG"] = privmsg;
-	commandMap["KICK"] = kick;
-	commandMap["INVITE"] = invite;
-	commandMap["TOPIC"] = topic;
-	commandMap["LIST"] = list;
-	commandMap["MODE"] = mode;
+
+typedef std::string (*CommandFunc)(User&, const Message&);
+std::map<std::string, CommandFunc> getCommandMap()
+{
+	std::map<std::string, CommandFunc> map;
+
+	map["PASS"] = pass;
+	map["PING"] = ping;
+	map["CAP" ] = cap;
+	map["QUIT"] = quit;
+	map["NICK"] = nick;
+	map["USER"] = userCmd;
+	map["JOIN"] = join;
+	map["PART"] = part;
+	map["PRIVMSG"] = privmsg;
+	map["KICK"] = kick;
+	map["INVITE"] = invite;
+	map["TOPIC"] = topic;
+	map["LIST"] = list;
+	map["MODE"] = mode;
+
+	return (map);
 }
 
-std::string addSpaceAfterColon(std::string str) {
-    size_t pos = str.find(':');
-    if (pos != std::string::npos && pos < str.size() - 1 && str[pos + 1] != ' ') {
-        str.insert(pos + 1, " ");
-    }
-    return str;
-}
+// std::string addSpaceAfterColon(std::string str) {
+//     size_t pos = str.find(':');
+//     if (pos != std::string::npos && pos < str.size() - 1 && str[pos + 1] != ' ') {
+//         str.insert(pos + 1, " ");
+//     }
+//     return str;
+// }
 
 void inputParsing(User &user, std::string input)
 {
+	static std::map<std::string, CommandFunc> commandMap = getCommandMap();
 
-	input = addSpaceAfterColon(input);
+	Message message(input);
 
-	std::string::size_type pos = input.find(':');
-    std::string temp;
-    if (pos != std::string::npos) {
-        temp = input.substr(pos + 2); 
-        input = input.substr(0, pos); 
-    }
+    std::map<std::string, CommandFunc>::iterator it = commandMap.find(message.getParamAt(0));
 
-	std::stringstream ss(input);
-	std::vector<std::string> tokens;
-	std::string token;
-	while (ss >> token)
-		tokens.push_back(token);	
-	tokens.push_back(temp);
-
-	std::transform(tokens[0].begin(), tokens[0].end(), tokens[0].begin(), ::toupper);
-
-    std::map<std::string, CommandFunc>::iterator it = commandMap.find(tokens[0]);
-    if (it != commandMap.end()) {
-        it->second(user, tokens);
-    } else {
-        std::string out = serverToClient(user, 421); //unknown command
-	}
+    if (it != commandMap.end())
+        user.queue(it->second(user, message));
+    else
+        user.queue(ERR_UNKNOWN_COMMAND(user, message.getParamAt(0))); //unknown command
 }

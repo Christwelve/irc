@@ -1,4 +1,5 @@
 #include "User.hpp"
+#include "Server.hpp"
 
 User::User(const Socket &socket): socket_(socket), state_(USER_EXPECTS_PASS), nickname_(""), username_(""), realname_(""), commandBuffer_("") {}
 
@@ -16,6 +17,11 @@ bool User::isRegistered(void) const
 
 const std::string &User::getNickname(void) const
 {
+	static std::string asterix = "*";
+
+	if (!isRegistered())
+		return (asterix);
+
 	return (nickname_);
 }
 
@@ -29,6 +35,11 @@ const std::string &User::getRealname(void) const
 	return (realname_);
 }
 
+std::string User::getUserIdent(void) const
+{
+	return (nickname_ + "!" + username_ + "@" + Server::getInstance().getHostIp());
+}
+
 bool User::hasState(UserState state) const
 {
 	return (state_ == state);
@@ -39,12 +50,12 @@ void User::setState(UserState state)
 	state_ = state;
 }
 
-void User::setNick(const std::string &nickname)
+void User::setNickname(const std::string &nickname)
 {
 	nickname_ = nickname;
 }
 
-void User::setUser(const std::string &username, const std::string &realname)
+void User::setUsername(const std::string &username, const std::string &realname)
 {
 	username_ = username;
 	realname_ = realname;
