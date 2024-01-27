@@ -1,7 +1,7 @@
 # :eye: :registered: :ocean: 
 
 
-/server add <server.name> <server.ip>/6667 -notls
+/server add <server.name> <server.ip>/6667 -notls -nosslwee
 
 
 # Commands

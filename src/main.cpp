@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 
 //     inputParsing(user, "qUiT :quitmessage");
 //     inputParsing(user, "NICK newNickname");
-//     inputParsing(user, "USER username hostname servername :realname");
+    // inputParsing(user, "USER username hostname servername :realname");
 //     inputParsing(user, "JOIN #channel");
 //     inputParsing(user, "PART #channel");
 //     inputParsing(user, "PRIVMSG receiver :message");
