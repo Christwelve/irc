@@ -5,14 +5,21 @@
 # include <queue>
 # include "Socket.hpp"
 
+enum UserState
+{
+	USER_EXPECTS_PASS,
+	USER_EXPECTS_NICK,
+	USER_EXPECTS_USER,
+	USER_REGISTERED
+};
+
 class User
 {
 	private:
 
 		Socket socket_;
 
-		bool isApproved_;
-		bool isRegistered_;
+		UserState state_;
 
 		std::string nickname_;
 		std::string username_;
@@ -27,17 +34,15 @@ class User
 
 		Socket &getSocket(void);
 
-		bool isApproved(void) const;
 		bool isRegistered(void) const;
-		void setApproved(void);
-		void setRegistered(void);
+		void setState(UserState state);
+		bool hasState(UserState state) const;
 
 		const std::string &getNickname(void) const;
 		const std::string &getUsername(void) const;
 		const std::string &getRealname(void) const;
-		void setNickname(const std::string &nickname);
-		void setUsername(const std::string &username);
-		void setRealname(const std::string &realname);
+		void setNick(const std::string &nickname);
+		void setUser(const std::string &username, const std::string &realname);
 
 		void appendCommandBuffer(const std::string &partialCommand);
 		void queue(const std::string &message);

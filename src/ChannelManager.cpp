@@ -33,6 +33,7 @@ void ChannelManager::addUserToChannel(const std::string &channelName, const User
 
 void ChannelManager::removeUserFromChannel(const std::string &channelName, const User &user)
 {
+	// TODO: notify users that user has left
 	channels_.at(channelName).removeUser(user);
 }
 

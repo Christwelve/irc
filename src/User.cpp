@@ -1,6 +1,6 @@
 #include "User.hpp"
 
-User::User(const Socket &socket): socket_(socket), isApproved_(false), isRegistered_(false), nickname_(""), username_(""), realname_(""), commandBuffer_("") {}
+User::User(const Socket &socket): socket_(socket), state_(USER_EXPECTS_PASS), nickname_(""), username_(""), realname_(""), commandBuffer_("") {}
 
 User::~User() {}
 
@@ -9,24 +9,9 @@ Socket &User::getSocket(void)
 	return (socket_);
 }
 
-bool User::isApproved(void) const
-{
-	return (isApproved_);
-}
-
 bool User::isRegistered(void) const
 {
-	return (isRegistered_);
-}
-
-void User::setApproved(void)
-{
-	isApproved_ = true;
-}
-
-void User::setRegistered(void)
-{
-	isRegistered_ = true;
+	return (state_ == USER_REGISTERED);
 }
 
 const std::string &User::getNickname(void) const
@@ -44,18 +29,24 @@ const std::string &User::getRealname(void) const
 	return (realname_);
 }
 
-void User::setNickname(const std::string &nickname)
+bool User::hasState(UserState state) const
+{
+	return (state_ == state);
+}
+
+void User::setState(UserState state)
+{
+	state_ = state;
+}
+
+void User::setNick(const std::string &nickname)
 {
 	nickname_ = nickname;
 }
 
-void User::setUsername(const std::string &username)
+void User::setUser(const std::string &username, const std::string &realname)
 {
 	username_ = username;
-}
-
-void User::setRealname(const std::string &realname)
-{
 	realname_ = realname;
 }
 
