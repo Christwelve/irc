@@ -18,6 +18,7 @@
 # define CLEAR "\033[0m"
 
 # define BUFFER_SIZE 1024
+# define SERVER_NAME "ircserv"
 
 
 class Server
