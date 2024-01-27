@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <sstream>
+#include <arpa/inet.h>
 #include "Server.hpp"
 #include "IRCError.hpp"
 #include "UserManager.hpp"
@@ -18,6 +19,7 @@ void Server::initServer(int port, const std::string &password)
 {
 	password_ = password;
 	socket_ = Socket(port);
+	host_ = inet_ntoa(socket_.getAddress()->sin_addr);
 
 	std::cout << "server listening on port " << port << std::endl;
 }
@@ -178,6 +180,11 @@ void Server::signalHandler(int signal)
 bool Server::isPasswordValid(const std::string &password) const
 {
 	return (password == password_);
+}
+
+const std::string &Server::getHostIp(void) const
+{
+	return (host_);
 }
 
 Server &Server::getInstance(void)

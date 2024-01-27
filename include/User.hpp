@@ -41,8 +41,9 @@ class User
 		const std::string &getNickname(void) const;
 		const std::string &getUsername(void) const;
 		const std::string &getRealname(void) const;
-		void setNick(const std::string &nickname);
-		void setUser(const std::string &username, const std::string &realname);
+		std::string getUserIdent(void) const;
+		void setNickname(const std::string &nickname);
+		void setUsername(const std::string &username, const std::string &realname);
 
 		void appendCommandBuffer(const std::string &partialCommand);
 		void queue(const std::string &message);

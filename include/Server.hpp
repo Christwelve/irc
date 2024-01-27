@@ -33,18 +33,20 @@ class Server
 		void shutdownServer(void);
 		static void signalHandler(int signal);
 
+		bool isPasswordValid(const std::string &password) const;
+		const std::string &getHostIp(void) const;
+
 	private:
 		Server(void);
 		std::string password_;
 		Socket socket_;
+		std::string host_;
 		std::vector<Socket> clients_;
 		bool running_;
 
 		void pollSockets(void);
 		void listenForNewClients(void);
 		void processClientSockets(void);
-
-		bool isPasswordValid(const std::string &password) const;
 };
 
 #endif
