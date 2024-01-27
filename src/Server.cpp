@@ -138,7 +138,7 @@ void Server::processClientSockets(void)
 			if(sent == -1)
 			{
 				std::cerr << "Failed to send message to socket " << socket.getFd() << std::endl;
-				userManager.removeUser(user);
+				user.remove();
 				continue;
 			}
 

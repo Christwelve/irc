@@ -235,6 +235,13 @@ void parseInput(User &user, std::string input)
 
 	Message message(input);
 
+	if(user.hasState(USER_EXPECTS_PASS) && message.getCommand() != "PASS")
+	{
+		// TODO: send error message
+		user.remove();
+		return;
+	}
+
     std::map<std::string, CommandFunc>::iterator it = commandMap.find(message.getCommand());
 
     if (it != commandMap.end())

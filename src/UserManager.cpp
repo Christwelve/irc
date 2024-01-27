@@ -48,6 +48,7 @@ void UserManager::deleteUserBySocket(const Socket &socket)
 
 		userSocket.close();
 		users_.erase(it);
+		break;
 	}
 }
 
