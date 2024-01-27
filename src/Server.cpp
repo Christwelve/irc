@@ -4,6 +4,7 @@
 #include "Server.hpp"
 #include "IRCError.hpp"
 #include "UserManager.hpp"
+#include "Parsing.hpp"
 
 Server::Server(void)
 {
@@ -106,7 +107,8 @@ void Server::processClientSockets(void)
 						continue;
 
 					std::cout << "received command from socket " << socket.getFd() << ": " << input << std::endl;
-					user.queue("You said: " + input);
+
+					parseInput(user, msg);
 				}
 				else
 				{

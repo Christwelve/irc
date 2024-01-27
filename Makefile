@@ -5,7 +5,7 @@ SRC_DIR=src
 OBJ_DIR=obj
 SRC=$(wildcard $(SRC_DIR)/*.cpp)
 OBJ=$(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
-HEADERS=$(wildcard *.hpp)
+HEADERS=$(wildcard include/*.hpp)
 INCLUDE=-Iinclude
 
 ifndef LENIENT
