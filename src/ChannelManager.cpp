@@ -31,7 +31,7 @@ bool ChannelManager::isValidChannelName(const std::string &name)
 
 bool ChannelManager::hasChannelWithName(const std::string &name) const
 {
-	return (channels_.find(name) != channels_.end());
+	return channels_.find(name) != channels_.end();
 }
 
 Channel &ChannelManager::createChannelWithName(const std::string &name)

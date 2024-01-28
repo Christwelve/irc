@@ -144,12 +144,12 @@ bool Channel::hasUser(const User &user) const
 
 bool Channel::isEmpty(void) const { return (users_.size() == 0); }
 
-bool isKeyValid(const std::string &key)
+bool Channel::isKeyValid(const std::string &key) const
 {
 	return (key == key_);
 }
 
-bool isUserOp(const User &user)
+bool Channel::isUserOp(const User &user) const
 {
 	return (std::find(operators_.begin(), operators_.end(), user) != operators_.end());
 }
