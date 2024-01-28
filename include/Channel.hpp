@@ -56,7 +56,6 @@ class Channel
 		const std::string &getName(void) const;
 		const std::string &getKey(void) const;
 		const std::string &getTopic(void) const;
-		unsigned int getLimit(void) const;
 
 		bool isInviteOnly(void) const;
 		bool isTopicRestricted(void) const;
@@ -64,6 +63,12 @@ class Channel
 		bool isUserLimit(void) const;
 
 		void sendMessage(const User &user, const std::string &message);
+
+		bool isFull(void) const;
+		bool hasUser(const User &user) const;
+		bool isEmpty(void) const;
+		bool isKeyValid(const std::string &key) const;
+		bool isUserOp(const User &user) const;
 };
 
 

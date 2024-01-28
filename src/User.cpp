@@ -1,5 +1,6 @@
 #include "User.hpp"
 #include "Server.hpp"
+#include "UserManager.hpp"
 
 User::User(const Socket &socket): socket_(socket), state_(USER_EXPECTS_PASS), nickname_(""), username_(""), realname_(""), commandBuffer_("") {}
 
@@ -111,6 +112,11 @@ std::string User::getInputFromCommandBuffer(void)
 		commandBuffer_.erase(0, input.length() + 1);
 	}
 	return (input);
+}
+
+void User::remove(void)
+{
+	UserManager::getInstance().removeUser(*this);
 }
 
 bool User::operator==(const User &user) const

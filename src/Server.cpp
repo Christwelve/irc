@@ -82,14 +82,14 @@ void Server::processClientSockets(void)
 			if(valread < 0)
 			{
 				std::cout << "Failed to send message to socket " << socket.getFd() << std::endl;
-				userManager.removeUser(user);
+				user.remove();
 				continue;
 			}
 			else if(valread == 0)
 			{
 				// Handle socket disconnection
 				std::cout << "socket " << socket.getFd() << " disconnected" << std::endl;
-				userManager.removeUser(user);
+				user.remove();
 				i--;
 				continue;
 			}
@@ -138,7 +138,7 @@ void Server::processClientSockets(void)
 			if(sent == -1)
 			{
 				std::cerr << "Failed to send message to socket " << socket.getFd() << std::endl;
-				userManager.removeUser(user);
+				user.remove();
 				continue;
 			}
 
