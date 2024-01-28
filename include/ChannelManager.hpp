@@ -17,6 +17,7 @@ class ChannelManager
 
 		~ChannelManager();
 
+		bool hasChannelWithName(const std::string &name) const;
 		void createChannel(const std::string &name);
 		const Channel &getChannelByName(const std::string &name) const;
 		void removeChannel(const Channel &channel);

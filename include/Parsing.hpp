@@ -11,6 +11,7 @@
 # include "UserManager.hpp"
 # include "Message.hpp"
 # include "MessageDefines.hpp"
+# include "ChannelManager.hpp"
 
 // std::string serverToClient(User &user, int status, std::string command) {
 //     std::map<int, std::string> statusMap;
@@ -132,8 +133,49 @@ std::string userCmd(User &user, const Message &message)
 
 std::string join(User &user, const Message &message)
 {
-	(void)user;
-	std::cout << "join() " << message.getParamAt(0) << std::endl;
+	ChannelManager &channelManager = ChannelManager::getInstance();
+
+	if(message.getParamCount() < 1)
+		return (ERR_NEED_MORE_PARAMS(user, "JOIN"));
+	if(!user.isRegistered())
+		// TODO: user not registered error
+		return (ERR_USER_ALREADY_REGISTERED(user));
+	if(channelManager.hasChannelWithName(message.getParamAt(0)))
+	{
+		Channel &channel = channelManager.getChannelWithName(message.getParamAt(0));
+		if(channel.hasUser(user))
+			return ("");
+		// TODO: use proper error messages
+		if(channel.isFull())
+			return (ERR_CHANNEL_FULL(user, message.getParamAt(0)));
+		if(channel.isInviteOnly() && !channel.hasUserWithMode(user, CHANNEL_MODE_O))
+			return (ERR_CHANNEL_INVITE_ONLY(user, message.getParamAt(0)));
+		if(channel.isKeyRequired() && channel.isKeyValid(message.getParamAt(1)))
+			return (ERR_CHANNEL_BAD_KEY(user, message.getParamAt(0)));
+		channel.addUser(user);
+		// make user op
+	}
+	else
+	{
+		// if(!Channel::isValidChannelName(message.getParamAt(0)))
+		// 	return (ERR_CHANNEL_INVALID_NAME(user, message.getParamAt(0)));
+		// if(message.getParamCount() > 1)
+		// {
+		// 	if(message.getParamAt(1).length() > 0)
+		// 	{
+		// 		if(message.getParamAt(1)[0] != '#')
+		// 			return (ERR_CHANNEL_INVALID_NAME(user, message.getParamAt(0)));
+		// 		if(message.getParamAt(1).length() > 1)
+		// 		{
+		// 			if(message.getParamAt(1)[1] == '#')
+		// 				return (ERR_CHANNEL_INVALID_NAME(user, message.getParamAt(0)));
+		// 		}
+		// 	}
+		// }
+		// channelManager.createChannelWithName(message.getParamAt(0));
+		// Channel &channel = channelManager.getChannelWithName(message.getParamAt(0));
+		// channel.addUser(user);
+	}
 
 	return ("");
 }
