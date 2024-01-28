@@ -106,7 +106,7 @@ void Server::processClientSockets(void)
 					if(input.length() == 0)
 						continue;
 
-					std::cout << "received command from socket " << socket.getFd() << ": " << input << std::endl;
+					std::cout << "FROM " << socket.getFd() << ": " << input << std::endl;
 
 					parseInput(user, msg);
 				}

@@ -22,7 +22,7 @@ class UserManager
 
 		void createUserFromSocket(const Socket &socket);
 		bool hasUserWithNickname(const std::string &nickname) const;
-		std::vector<User>::iterator getUserByNickname(const std::string &nickname);
+		User &getUserByNickname(const std::string &nickname);
 		void deleteUserBySocket(const Socket &socket);
 
 		void removeUser(User &user);

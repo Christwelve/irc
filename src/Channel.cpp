@@ -49,7 +49,7 @@ void Channel::removeUser(const User &user)
 {
 	for (unsigned long i = 0; i < users_.size(); i++)
 	{
-		if (users_.at(i).getNickname() == user.getNickname())
+		if (users_.at(i) == user)
 		{
 			users_.erase(users_.begin() + i);
 			return;
@@ -62,7 +62,7 @@ void Channel::removeOperator(const User &user)
 {
 	for (unsigned long i = 0; i < operators_.size(); i++)
 	{
-		if (operators_.at(i).getNickname() == user.getNickname())
+		if (operators_.at(i) == user)
 		{
 			operators_.erase(operators_.begin() + i);
 			return;
@@ -75,7 +75,7 @@ void Channel::removeInvite(const User &user)
 {
 	for (unsigned long i = 0; i < invites_.size(); i++)
 	{
-		if (invites_.at(i).getNickname() == user.getNickname())
+		if (invites_.at(i) == user)
 		{
 			invites_.erase(invites_.begin() + i);
 			return;
@@ -100,13 +100,13 @@ void Channel::setTopic(const std::string &topic) { topic_ = topic; }
 
 void Channel::setLimit(unsigned int limit) { limit_ = limit; }
 
-void Channel::setInviteOnly(void) { i_ = true; }
+void Channel::setInviteOnly(bool flag) { i_ = flag; }
 
-void Channel::setTopicRestricted(void) { t_ = true; }
+void Channel::setTopicRestricted(bool flag) { t_ = flag; }
 
-void Channel::setKeyRequired(void) { k_ = true; }
+void Channel::setKeyRequired(bool flag) { k_ = flag; }
 
-void Channel::setUserLimit(void) { l_ = true; }
+void Channel::setUserLimit(bool flag) { l_ = flag; }
 
 
 // CHANNEL GETTERS
@@ -152,4 +152,9 @@ bool Channel::isKeyValid(const std::string &key) const
 bool Channel::isUserOp(const User &user) const
 {
 	return (std::find(operators_.begin(), operators_.end(), user) != operators_.end());
+}
+
+bool Channel::isUserInvited(const User &user) const
+{
+	return (std::find(invites_.begin(), invites_.end(), user) != invites_.end());
 }

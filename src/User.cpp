@@ -69,6 +69,7 @@ void User::appendCommandBuffer(const std::string &partialCommand)
 
 void User::queue(const std::string &message)
 {
+	std::cout << "TO " << nickname_ << ": " << message << std::endl;
 	messageQueue_.push(message + "\r\n");
 }
 

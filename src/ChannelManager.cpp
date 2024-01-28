@@ -36,10 +36,9 @@ bool ChannelManager::hasChannelWithName(const std::string &name) const
 
 Channel &ChannelManager::createChannelWithName(const std::string &name)
 {
-	Channel channel(name);
-	channels_.insert(std::pair<const std::string, Channel>(name, channel));
+	channels_.insert(std::pair<const std::string, Channel>(name, Channel(name)));
 
-	return channel;
+	return getChannelByName(name);
 }
 
 Channel &ChannelManager::getChannelByName(const std::string &name)
@@ -75,4 +74,3 @@ void ChannelManager::sendMessageToChannel(Channel &channel, const User &user, co
 {
 	channel.sendMessage(user, message);
 }
-
