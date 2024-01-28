@@ -139,7 +139,7 @@ std::string join(User &user, const Message &message)
 		return (ERR_NEED_MORE_PARAMS(user, "JOIN"));
 	if(!user.isRegistered())
 		// TODO: user not registered error
-		return (ERR_NOT_REGISTERED(user));
+		return (ERR_USER_NOT_REGISTERED(user));
 	if(channelManager.hasChannelWithName(message.getParamAt(0)))
 	{
 		Channel &channel = channelManager.getChannelWithName(message.getParamAt(0));
@@ -152,7 +152,7 @@ std::string join(User &user, const Message &message)
 		if(channel.isInviteOnly() && !channel.hasUserWithMode(user, CHANNEL_MODE_O))
 			return (ERR_CHANNEL_INVITE_ONLY(user, message.getParamAt(0)));
 		if(channel.isKeyRequired() && channel.isKeyValid(message.getParamAt(1)))
-			return (ERR_CHANNEL_BAD_KEY(user, message.getParamAt(0)));
+			return (ERR_CHANNEL_INVALID_KEY(user, message.getParamAt(0)));
 		channel.addUser(user);
 	}
 	else
@@ -175,7 +175,7 @@ std::string part(User &user, const Message &message)
 		return (ERR_NEED_MORE_PARAMS(user, "PART"));
 	if(!user.isRegistered())
 		// TODO: user not registered error
-		return (ERR_NOT_REGISTERED(user));
+		return (ERR_USER_NOT_REGISTERED(user));
 	if(!channelManager.hasChannelWithName(message.getParamAt(0)))
 		return (ERR_CHANNEL_DOESNT_EXIST(user, message.getParamAt(0)));
 
@@ -184,7 +184,7 @@ std::string part(User &user, const Message &message)
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, message.getParamAt(0)));
 	channel.removeUser(user);
-	channel.sendMessage(user, "User " + user.getNickname() + "left the channel" + (message.hasTrailing() ? " - " + message.getTrailing() : ""));
+	channel.sendMessage(user, "User " + user.getNickname() + " has left the channel" + (message.hasTrailing() ? " - " + message.getTrailing() : ""));
 	if(channel.isEmpty())
 		channelManager.removeChannel(channel);
 
@@ -193,8 +193,29 @@ std::string part(User &user, const Message &message)
 
 std::string privmsg(User &user, const Message &message)
 {
-	(void)user;
-	std::cout << "privmsg() " << message.getParamAt(0) << message.getParamAt(1) << std::endl;
+	ChannelManager &channelManager = ChannelManager::getInstance();
+	UserManager &userManager = UserManager::getInstance();
+
+	if(message.getParamCount() < 2)
+		return (ERR_NEED_MORE_PARAMS(user, "PRIVMSG"));
+	if(!user.isRegistered())
+		return (ERR_USER_NOT_REGISTERED(user));
+	if(message.getParamAt(0)[0] == '#')
+	{
+		if(!channelManager.hasChannelWithName(message.getParamAt(0)))
+			return (ERR_CHANNEL_DOESNT_EXIST(user, message.getParamAt(0)));
+		Channel &channel = channelManager.getChannelWithName(message.getParamAt(0));
+		if(!channel.hasUser(user))
+			return (ERR_NOT_MEMBER_OF_CHANNEL(user, message.getParamAt(0)));
+		channel.sendMessage(user, message.getTrailing());
+	}
+	else
+	{
+		if(!userManager.hasUserWithNickname(message.getParamAt(0)))
+			return (ERR_NICK_DOESNT_EXIST(user, message.getParamAt(0)));
+		User &target = userManager.getUserByNickname(message.getParamAt(0));
+		target.queue(PRIVMSG_SEND_MESSAGE(target, target.getNickname(), message.getTrailing()));
+	}
 
 	return ("");
 }

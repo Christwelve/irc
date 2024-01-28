@@ -14,6 +14,7 @@ class ChannelManager
 
 	public:
 		static ChannelManager &getInstance(void);
+		static bool isValidChannelName(const std::string &name);
 
 		~ChannelManager();
 

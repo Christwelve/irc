@@ -10,6 +10,25 @@ ChannelManager &ChannelManager::getInstance(void)
 	return instance;
 }
 
+bool ChannelManager::isValidChannelName(const std::string &name)
+{
+	static const std::string validChannelNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
+
+	if (name.length() < 2 || name.length() > 50)
+		return false;
+
+	if (name[0] != '#')
+		return false;
+
+	for (unsigned long i = 1; i < name.length(); i++)
+	{
+		if(validChannelNameCharacters.find(name[i]) == std::string::npos)
+			return false;
+	}
+
+	return true;
+}
+
 bool ChannelManager::hasChannelWithName(const std::string &name) const
 {
 	return (channels_.find(name) != channels_.end());

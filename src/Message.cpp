@@ -41,12 +41,9 @@ const std::string &Message::getParamAt(unsigned long index) const
 	return (params_.at(index));
 }
 
-const std::string &Message::getTrailing() const
+std::string Message::getTrailing() const
 {
-	if (!hasTrailing())
-		throw std::out_of_range("No trailing");
-
-	return (trailing_);
+	return (hasTrailing() ? trailing_ : "");
 }
 
 size_t Message::getParamCount() const

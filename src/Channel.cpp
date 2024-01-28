@@ -143,3 +143,8 @@ bool Channel::hasUser(const User &user) const
 }
 
 bool Channel::isEmpty(void) const { return (users_.size() == 0); }
+
+bool isKeyValid(const std::string &key)
+{
+	return (key == key_);
+}
