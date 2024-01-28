@@ -17,12 +17,12 @@ void UserManager::createUserFromSocket(const Socket &socket)
 
 bool UserManager::hasUserWithNickname(const std::string &nickname) const
 {
-	return (getUserByNickname(nickname) != users_.end());
+	return (std::find(users_.begin(), users_.end(), nickname) != users_.end());
 }
 
 std::vector<User>::iterator UserManager::getUserByNickname(const std::string &nickname)
 {
-	return (users_.find(nickname));
+	return (std::find(users_.begin(), users_.end(), nickname));
 }
 
 void UserManager::deleteUserBySocket(const Socket &socket)

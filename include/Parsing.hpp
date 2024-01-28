@@ -139,11 +139,12 @@ std::string join(User &user, const Message &message)
 		return (ERR_NEED_MORE_PARAMS(user, "JOIN"));
 	if(!user.isRegistered())
 		// TODO: user not registered error
-		return (ERR_USER_ALREADY_REGISTERED(user));
+		return (ERR_NOT_REGISTERED(user));
 	if(channelManager.hasChannelWithName(message.getParamAt(0)))
 	{
 		Channel &channel = channelManager.getChannelWithName(message.getParamAt(0));
 		if(channel.hasUser(user))
+		// TODO: what to use here?
 			return ("");
 		// TODO: use proper error messages
 		if(channel.isFull())
@@ -153,28 +154,14 @@ std::string join(User &user, const Message &message)
 		if(channel.isKeyRequired() && channel.isKeyValid(message.getParamAt(1)))
 			return (ERR_CHANNEL_BAD_KEY(user, message.getParamAt(0)));
 		channel.addUser(user);
-		// make user op
 	}
 	else
 	{
-		// if(!Channel::isValidChannelName(message.getParamAt(0)))
-		// 	return (ERR_CHANNEL_INVALID_NAME(user, message.getParamAt(0)));
-		// if(message.getParamCount() > 1)
-		// {
-		// 	if(message.getParamAt(1).length() > 0)
-		// 	{
-		// 		if(message.getParamAt(1)[0] != '#')
-		// 			return (ERR_CHANNEL_INVALID_NAME(user, message.getParamAt(0)));
-		// 		if(message.getParamAt(1).length() > 1)
-		// 		{
-		// 			if(message.getParamAt(1)[1] == '#')
-		// 				return (ERR_CHANNEL_INVALID_NAME(user, message.getParamAt(0)));
-		// 		}
-		// 	}
-		// }
-		// channelManager.createChannelWithName(message.getParamAt(0));
-		// Channel &channel = channelManager.getChannelWithName(message.getParamAt(0));
-		// channel.addUser(user);
+		if(!Channel::isValidChannelName(message.getParamAt(0)))
+			return (ERR_CHANNEL_INVALID_NAME(user, message.getParamAt(0)));
+		Channel &channel = channelManager.createChannelWithName(message.getParamAt(0));
+		channel.addUser(user);
+		channel.addOperator(user);
 	}
 
 	return ("");
@@ -182,9 +169,24 @@ std::string join(User &user, const Message &message)
 
 std::string part(User &user, const Message &message)
 {
-	(void)user;
+	ChannelManager &channelManager = ChannelManager::getInstance();
 
-	std::cout << "part() " << message.getParamAt(0) << std::endl;
+	if(message.getParamCount() < 1)
+		return (ERR_NEED_MORE_PARAMS(user, "PART"));
+	if(!user.isRegistered())
+		// TODO: user not registered error
+		return (ERR_NOT_REGISTERED(user));
+	if(!channelManager.hasChannelWithName(message.getParamAt(0)))
+		return (ERR_CHANNEL_DOESNT_EXIST(user, message.getParamAt(0)));
+
+	Channel &channel = channelManager.getChannelWithName(message.getParamAt(0));
+
+	if(!channel.hasUser(user))
+		return (ERR_NOT_MEMBER_OF_CHANNEL(user, message.getParamAt(0)));
+	channel.removeUser(user);
+	channel.sendMessage(user, "User " + user.getNickname() + "left the channel" + (message.hasTrailing() ? " - " + message.getTrailing() : ""));
+	if(channel.isEmpty())
+		channelManager.removeChannel(channel);
 
 	return ("");
 }

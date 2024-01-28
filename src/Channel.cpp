@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include "UserManager.hpp"
+#include "MessageDefines.hpp"
 
 Channel::Channel(const std::string &name)
 {
@@ -115,8 +116,6 @@ const std::string &Channel::getKey(void) const { return (key_); }
 
 const std::string &Channel::getTopic(void) const { return (topic_); }
 
-unsigned int Channel::getLimit(void) const { return (limit_); }
-
 bool Channel::isInviteOnly(void) const { return (i_); }
 
 bool Channel::isTopicRestricted(void) const { return (t_); }
@@ -132,6 +131,15 @@ void Channel::sendMessage(const User &user, const std::string &message)
 	for (unsigned long i = 0; i < users_.size(); i++)
 	{
 		if (users_.at(i) != user)
-			users_.at(i).queue(message);
+			users_.at(i).queue(PRIVMSG_SEND_MESSAGE(user, name_, message));
 	}
 }
+
+bool Channel::isFull(void) const { return (users_.size() >= limit_); }
+
+bool Channel::hasUser(const User &user) const
+{
+	return (std::find(users_.begin(), users_.end(), user) != users_.end());
+}
+
+bool Channel::isEmpty(void) const { return (users_.size() == 0); }
