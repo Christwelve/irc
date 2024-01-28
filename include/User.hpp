@@ -53,6 +53,8 @@ class User
 		bool hasOutput(void) const;
 		std::string getInputFromCommandBuffer(void);
 
+		void remove(void);
+
 		bool operator==(const User &user) const;
 		bool operator!=(const User &user) const;
 };

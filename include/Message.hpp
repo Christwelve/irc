@@ -11,8 +11,8 @@ class Message
 		~Message();								// Destructor
 
 		const std::string &getCommand() const;
-		const std::string &getParamAt(unsigned long index) const;
-		const std::string &getTrailing() const;
+		std::string getParamAt(unsigned long index) const;
+		std::string getTrailing() const;
 		bool hasTrailing() const;
 		size_t getParamCount() const;
 

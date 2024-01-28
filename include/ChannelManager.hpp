@@ -14,16 +14,19 @@ class ChannelManager
 
 	public:
 		static ChannelManager &getInstance(void);
+		static bool isValidChannelName(const std::string &name);
 
 		~ChannelManager();
 
-		void createChannel(const std::string &name);
-		const Channel &getChannelByName(const std::string &name) const;
+		bool hasChannelWithName(const std::string &name) const;
+		Channel &createChannelWithName(const std::string &name);
+		Channel &getChannelByName(const std::string &name);
 		void removeChannel(const Channel &channel);
 
-		void addUserToChannel(const std::string &channelName, const User &user);
-		void removeUserFromChannel(const std::string &channelName, const User &user);
-		void sendMessageToChannel(const std::string &channelName, const User &user, const std::string &message);
+		void addUserToChannel(Channel &channel, const User &user);
+		void removeUserFromChannel(Channel &channel, const User &user);
+		void removeUserFromAllChannels(const User &user);
+		void sendMessageToChannel(Channel &channel, const User &user, const std::string &message);
 };
 
 #endif

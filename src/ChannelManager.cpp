@@ -10,12 +10,39 @@ ChannelManager &ChannelManager::getInstance(void)
 	return instance;
 }
 
-void ChannelManager::createChannel(const std::string &name)
+bool ChannelManager::isValidChannelName(const std::string &name)
 {
-	channels_.insert(std::pair<const std::string, Channel>(name, Channel(name)));
+	static const std::string validChannelNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
+
+	if (name.length() < 2 || name.length() > 50)
+		return false;
+
+	if (name[0] != '#')
+		return false;
+
+	for (unsigned long i = 1; i < name.length(); i++)
+	{
+		if(validChannelNameCharacters.find(name[i]) == std::string::npos)
+			return false;
+	}
+
+	return true;
 }
 
-const Channel &ChannelManager::getChannelByName(const std::string &name) const
+bool ChannelManager::hasChannelWithName(const std::string &name) const
+{
+	return (channels_.find(name) != channels_.end());
+}
+
+Channel &ChannelManager::createChannelWithName(const std::string &name)
+{
+	Channel channel(name);
+	channels_.insert(std::pair<const std::string, Channel>(name, channel));
+
+	return channel;
+}
+
+Channel &ChannelManager::getChannelByName(const std::string &name)
 {
 	return channels_.at(name);
 }
@@ -26,19 +53,26 @@ void ChannelManager::removeChannel(const Channel &channel)
 	channels_.erase(channel.getName());
 }
 
-void ChannelManager::addUserToChannel(const std::string &channelName, const User &user)
+void ChannelManager::addUserToChannel(Channel &channel, const User &user)
 {
-	channels_.at(channelName).addUser(user);
+	channel.addUser(user);
+	// TODO: add proper channel join message
+	channel.sendMessage(user, user.getNickname() + " has joined the channel");
 }
 
-void ChannelManager::removeUserFromChannel(const std::string &channelName, const User &user)
+void ChannelManager::removeUserFromChannel(Channel &channel, const User &user)
 {
-	// TODO: notify users that user has left
-	channels_.at(channelName).removeUser(user);
+	channel.removeUser(user);
 }
 
-void ChannelManager::sendMessageToChannel(const std::string &channelName, const User &user, const std::string &message)
+void ChannelManager::removeUserFromAllChannels(const User &user)
 {
-	channels_.at(channelName).sendMessage(user, message);
+	for (std::map<const std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); ++it)
+		it->second.removeUser(user);
+}
+
+void ChannelManager::sendMessageToChannel(Channel &channel, const User &user, const std::string &message)
+{
+	channel.sendMessage(user, message);
 }
 
