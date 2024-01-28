@@ -48,10 +48,10 @@ class Channel
 		void setTopic(const std::string &topic);
 		void setLimit(unsigned int limit);
 
-		void setInviteOnly(void);
-		void setTopicRestricted(void);
-		void setKeyRequired(void);
-		void setUserLimit(void);
+		void setInviteOnly(bool flag);
+		void setTopicRestricted(bool flag);
+		void setKeyRequired(bool flag);
+		void setUserLimit(bool flag);
 
 		const std::string &getName(void) const;
 		const std::string &getKey(void) const;
@@ -69,6 +69,7 @@ class Channel
 		bool isEmpty(void) const;
 		bool isKeyValid(const std::string &key) const;
 		bool isUserOp(const User &user) const;
+		bool isUserInvited(const User &user) const;
 };
 
 

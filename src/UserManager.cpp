@@ -1,4 +1,5 @@
 #include "UserManager.hpp"
+#include "IRCError.hpp"
 
 UserManager::UserManager(void) {}
 
@@ -17,12 +18,24 @@ void UserManager::createUserFromSocket(const Socket &socket)
 
 bool UserManager::hasUserWithNickname(const std::string &nickname) const
 {
-	return (std::find(users_.begin(), users_.end(), nickname) != users_.end());
+	for(std::vector<User>::const_iterator it = users_.begin(); it != users_.end(); it++)
+	{
+		if (it->getNickname() == nickname)
+			return true;
+	}
+
+	return false;
 }
 
-std::vector<User>::iterator UserManager::getUserByNickname(const std::string &nickname)
+User &UserManager::getUserByNickname(const std::string &nickname)
 {
-	return (std::find(users_.begin(), users_.end(), nickname));
+	for(std::vector<User>::iterator it = users_.begin(); it != users_.end(); it++)
+	{
+		if (it->getNickname() == nickname)
+			return *it;
+	}
+
+	throw IRCError("UserManager::getUserByNickname: no user with nickname " + nickname);
 }
 
 void UserManager::deleteUserBySocket(const Socket &socket)
