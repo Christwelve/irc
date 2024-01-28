@@ -13,33 +13,6 @@
 # include "MessageDefines.hpp"
 # include "ChannelManager.hpp"
 
-// std::string serverToClient(User &user, int status, std::string command) {
-//     std::map<int, std::string> statusMap;
-//     statusMap[001] = ":" + std::string(SERVER_NAME) + " 001 " + user.getNickname() + " :Welcome message sent after a successful connection.";
-//     // statusMap[002] = ":" + std::string(SERVER_NAME) + " 002 " + user.getNickname() + " :Server's version information.";
-//     // statusMap[003] = ":" + std::string(SERVER_NAME) + " 003 " + user.getNickname() + " :Server's creation date.";
-//     // statusMap[004] = ":" + std::string(SERVER_NAME) + " 004 " + user.getNickname() + " :Server's details (name, version, available user modes, available channel modes).";
-//     // statusMap[005] = ":" + std::string(SERVER_NAME) + " 005 " + user.getNickname() + " :Additional server features.";
-//     // statusMap[353] = ":" + std::string(SERVER_NAME) + " 353 " + user.getNickname() + " :Reply to the NAMES command, listing all visible users in a channel.";
-//     // statusMap[366] = ":" + std::string(SERVER_NAME) + " 366 " + user.getNickname() + " :End of NAMES list.";
-//     // statusMap[372] = ":" + std::string(SERVER_NAME) + " 372 " + user.getNickname() + " :MOTD (Message of the Day) text line.";
-//     // statusMap[375] = ":" + std::string(SERVER_NAME) + " 375 " + user.getNickname() + " :Start of MOTD.";
-//     // statusMap[376] = ":" + std::string(SERVER_NAME) + " 376 " + user.getNickname() + " :End of MOTD.";
-//     statusMap[421] = ":" + std::string(SERVER_NAME) + " 421 " + user.getNickname() + " :Unknown command.";
-//     statusMap[433] = ":" + std::string(SERVER_NAME) + " 433 " + user.getNickname() + " :Nickname is already in use.";
-//     statusMap[441] = ":" + std::string(SERVER_NAME) + " 441 " + user.getNickname() + " :User not in channel (used when trying to kick a user not in channel).";
-//     statusMap[442] = ":" + std::string(SERVER_NAME) + " 442 " + user.getNickname() + " :Not on channel (used when trying to perform a channel operation without being on the channel).";
-//     statusMap[461] = ":" + std::string(SERVER_NAME) + " 461 " + user.getNickname() + " " + command + " :Need more parameters.";
-//     statusMap[462] = ":" + std::string(SERVER_NAME) + " 462 " + user.getNickname() + " :Already registered (used when a client tries to register again).";
-//     statusMap[464] = ":" + std::string(SERVER_NAME) + " 464 " + user.getNickname() + " :Incorrect password.";
-//     statusMap[465] = ":" + std::string(SERVER_NAME) + " 465 " + user.getNickname() + " :You are banned from this server.";
-//     statusMap[471] = ":" + std::string(SERVER_NAME) + " 471 " + user.getNickname() + " :Channel is full.";
-//     statusMap[473] = ":" + std::string(SERVER_NAME) + " 473 " + user.getNickname() + " :Invite only channel.";
-//     statusMap[474] = ":" + std::string(SERVER_NAME) + " 474 " + user.getNickname() + " :Banned from channel.";
-//     statusMap[475] = ":" + std::string(SERVER_NAME) + " 475 " + user.getNickname() + " :Bad channel key.";
-
-//     return statusMap[status];
-// }
 
 class Server;
 
@@ -100,6 +73,7 @@ std::string cap(User &user, const Message &message)
 std::string quit(User &user, const Message &message)
 {
 	(void)user;
+	// user.remove();
 	std::cout << "quit() " << user.getNickname() << message.getParamAt(0) << std::endl;
 	//sendFuntion()
 	// :nickname!username@hostname QUIT :<quit message>\r\n
@@ -142,7 +116,7 @@ std::string userCmd(User &user, const Message &message)
 
 	user.setUsername(message.getParamAt(0), message.getParamAt(2));
 	user.setState(USER_REGISTERED);
-
+	// TODO: message
 	user.queue(":" + std::string(SERVER_NAME) + " 001 " + user.getNickname() + " :Ey Mate! Welcome to 👁️  ®️  🌊");
 
 	return ("");
@@ -496,14 +470,6 @@ std::map<std::string, CommandFunc> getCommandMap()
 	return (map);
 }
 
-// std::string addSpaceAfterColon(std::string str) {
-//     size_t pos = str.find(':');
-//     if (pos != std::string::npos && pos < str.size() - 1 && str[pos + 1] != ' ') {
-//         str.insert(pos + 1, " ");
-//     }
-//     return str;
-// }
-
 void parseInput(User &user, std::string input)
 {
 	static std::map<std::string, CommandFunc> commandMap = getCommandMap();
@@ -526,7 +492,7 @@ void parseInput(User &user, std::string input)
 			user.queue(response);
 	}
     else
-        user.queue(ERR_UNKNOWN_COMMAND(user, message.getCommand())); //unknown command
+        user.queue(ERR_UNKNOWN_COMMAND(user, message.getCommand()));
 }
 
 #endif
