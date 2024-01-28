@@ -1,7 +1,10 @@
-# :eye: :registered: :ocean: 
+# :eye: :registered: :ocean:
 
 
 /server add <server.name> <server.ip>/6667 -notls -nosslwee
+
+Turn off debugging messages:
+/set weechat.network.gnutls_log_level 1
 
 
 # Commands
@@ -10,13 +13,13 @@ CAP -> ignore
 
 QUIT -> rm socket(fd), rm user from channels / delete channels, rm user from user.map, close socket
 
-USER -> addNewUser, User-, Real-, Nickname,  
+USER -> addNewUser, User-, Real-, Nickname,
 
 JOIN -> addUser to channel / create channel
 
 PART ->	leave a channel
 
-PRIVMSG -> send message publicly or privatly 
+PRIVMSG -> send message publicly or privatly
 
 KICK -> (depending on own role) remove user from channel
 
@@ -27,14 +30,14 @@ TOPIC -> shows current topic, /topic <new_topic> replaces current topic
 LIST -> shows a list of all channels
 
 MODE -> shows current mode
-	
+
  -i set/unset invite only
 
  -t set/unset /topic cmd
 
  -k set/unset channel key
 
- -o set/unset operator priviledge 
+ -o set/unset operator priviledge
 
 
 # Client -> Server communication
@@ -43,7 +46,7 @@ QUIT :<quit message>
 
 NICK <new-nickname>
 
-USER <username> <hostname> <servername> :<realname> 
+USER <username> <hostname> <servername> :<realname>
 
 JOIN <#channelname>
 
@@ -70,7 +73,7 @@ QUIT 	->		(to all other users of a channel): :Nickname!Username@hostname QUIT :Q
 
 NICK 	->		:NICK <old-nickname> <new-nickname>
 			:server ERR_NICKNAMEINUSE * <new-nickname> :Nickname is already in use
-				
+
 USER 	->		:server 001 <nickname> :Welcome to the Internet Relay Network <nick>!<user>@<host>
 
 JOIN 	->		:Nick!User@host JOIN :#channelname
@@ -79,7 +82,7 @@ JOIN 	->		:Nick!User@host JOIN :#channelname
 
 PART 	->		:Nick!User@host PART #channelname
 
-PRIVMSG ->		:Nick!User@host PRIVMSG #channelname :<message> 
+PRIVMSG ->		:Nick!User@host PRIVMSG #channelname :<message>
 			:server ERR_CANNOTSENDTOCHAN <nickname> #channelname :Cannot send to channel
 
 PRIVMSG	->		:Nick!User@host PRIVMSG <nickname> :<message>
