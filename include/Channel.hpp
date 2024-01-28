@@ -68,6 +68,7 @@ class Channel
 		bool hasUser(const User &user) const;
 		bool isEmpty(void) const;
 		bool isKeyValid(const std::string &key) const;
+		bool isUserOp(const User &user) const;
 };
 
 

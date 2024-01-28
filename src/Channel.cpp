@@ -148,3 +148,8 @@ bool isKeyValid(const std::string &key)
 {
 	return (key == key_);
 }
+
+bool isUserOp(const User &user)
+{
+	return (std::find(operators_.begin(), operators_.end(), user) != operators_.end());
+}

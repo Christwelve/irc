@@ -36,8 +36,11 @@ const std::string &Message::getCommand() const
 	return (command_);
 }
 
-const std::string &Message::getParamAt(unsigned long index) const
+std::string Message::getParamAt(unsigned long index) const
 {
+	if(index >= params_.size())
+		return ("");
+
 	return (params_.at(index));
 }
 
