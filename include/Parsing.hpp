@@ -15,6 +15,8 @@
 
 
 class Server;
+// class ChannelManager;
+// class UserManager;
 
 enum Mode
 {
@@ -136,13 +138,13 @@ std::string join(User &user, const Message &message)
 
 	if(channelManager.hasChannelWithName(channelName))
 	{
-		Channel &channel = channelManager.getChannelWithName(channelName);
+		Channel &channel = channelManager.getChannelByName(channelName);
 		if(channel.hasUser(user))
 		// TODO: what to use here?
-			return (ERR_USER_ALREADY_IN_CHANNEL(user, channelName));
+			return (ERR_USER_IS_ALREADY_ON_CHANNEL(user, channelName));
 		// TODO: use proper error messages
 		if(channel.isFull())
-			return (ERR_CHANNEL_FULL(user, channelName));
+			return (ERR_CHANNEL_IS_FULL(user, channelName));
 		if(channel.isInviteOnly() && !channel.hasUserWithMode(user, CHANNEL_MODE_O))
 			return (ERR_CHANNEL_INVITE_ONLY(user, channelName));
 		if(channel.isKeyRequired() && channel.isKeyValid(message.getParamAt(1)))
@@ -151,7 +153,7 @@ std::string join(User &user, const Message &message)
 	}
 	else
 	{
-		if(!Channel::isValidChannelName(channelName))
+		if(!ChannelManager::isValidChannelName(channelName))
 			return (ERR_CHANNEL_INVALID_NAME(user, channelName));
 		Channel &channel = channelManager.createChannelWithName(channelName);
 		channel.addUser(user);
@@ -176,7 +178,7 @@ std::string part(User &user, const Message &message)
 	if(!channelManager.hasChannelWithName(channelName))
 		return (ERR_CHANNEL_DOESNT_EXIST(user, channelName));
 
-	Channel &channel = channelManager.getChannelWithName(channelName);
+	Channel &channel = channelManager.getChannelByName(channelName);
 
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, channelName));
@@ -204,7 +206,7 @@ std::string privmsg(User &user, const Message &message)
 	{
 		if(!channelManager.hasChannelWithName(targetName))
 			return (ERR_CHANNEL_DOESNT_EXIST(user, targetName));
-		Channel &channel = channelManager.getChannelWithName(targetName);
+		Channel &channel = channelManager.getChannelByName(targetName);
 		if(!channel.hasUser(user))
 			return (ERR_NOT_MEMBER_OF_CHANNEL(user, targetName));
 		channel.sendMessage(user, message.getTrailing());
@@ -233,14 +235,14 @@ std::string kick(User &user, const Message &message)
 	if(message.getParamCount() < 2)
 		return (ERR_NEED_MORE_PARAMS(user, "KICK"));
 	if(!channelManager.hasChannelWithName(channelName))
-		return (ERR_CHANNEL_DOESNT_EXIST(user, channelName))
+		return (ERR_CHANNEL_DOESNT_EXIST(user, channelName));
 
 	Channel &channel = channelManager.getChannelByName(channelName);
 
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, targetName));
 	if(!channel.isUserOp(user))
-		return (ERR_USER_NOT_OPERATOR(user));
+		return (ERR_CHANNEL_NOT_OPERATOR(user, channelName));
 
 	if(userManager.hasUserWithNickname(targetName))
 		return (ERR_NICK_DOESNT_EXIST(user, targetName));
@@ -273,14 +275,14 @@ std::string invite(User &user, const Message &message)
 	if(!channelManager.hasChannelWithName(channelName))
 		return (ERR_CHANNEL_DOESNT_EXIST(user, channelName));
 
-	Channel &channel = channelManager.getChannelWithName(channelName);
+	Channel &channel = channelManager.getChannelByName(channelName);
 
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, channelName));
 
 	User &target = userManager.getUserByNickname(targetName);
 
-	return (INVITE_INVITE_USER(user, target, channel));
+	return (INVITE_USER(user, target, channel));
 }
 
 std::string topic(User &user, const Message &message)
@@ -288,6 +290,7 @@ std::string topic(User &user, const Message &message)
 	ChannelManager &channelManager = ChannelManager::getInstance();
 
 	std::string channelName = message.getParamAt(0);
+	std::string topic = message.getTrailing();
 
 	if(!user.isRegistered())
 		return (ERR_USER_NOT_REGISTERED(user));
@@ -296,14 +299,14 @@ std::string topic(User &user, const Message &message)
 	if(!channelManager.hasChannelWithName(channelName))
 		return (ERR_CHANNEL_DOESNT_EXIST(user, channelName));
 
-	Channel &channel = channelManager.getChannelWithName(channelName);
+	Channel &channel = channelManager.getChannelByName(channelName);
 
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, channelName));
 	if(channel.isTopicRestricted() && !channel.isUserOp(user))
-		return (ERR_USER_NOT_OPERATOR(user));
+		return (ERR_CHANNEL_NOT_OPERATOR(user, channelName));
 
-	return (TOPIC_SET_TOPIC(user, channel));
+	return (TOPIC_CHANGED(user, channelName, topic));
 }
 
 std::string list(User &user, const Message &message)
@@ -355,11 +358,12 @@ std::string mode(User &user, const Message &message)
 	if(!channelManager.hasChannelWithName(channelName))
 		return (ERR_CHANNEL_DOESNT_EXIST(user, channelName));
 
+	Channel &channel = channelManager.getChannelByName(channelName);
 
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, channelName));
 	if(!channel.isUserOp(user))
-		return (ERR_USER_NOT_OPERATOR(user));
+		return (ERR_CHANNEL_NOT_OPERATOR(user));
 
 	std::string modeStr = message.getParamAt(1);
 
@@ -374,12 +378,12 @@ std::string mode(User &user, const Message &message)
 		// TODO: better response?
 		return (ERR_UNKNOWN_COMMAND(user, "MODE"));
 
-	Channel &channel = channelManager.getChannelWithName(channelName);
+	Channel &channel = channelManager.getChannelByName(channelName);
 
 	if(mode == MODE_INVITE)
 	{
 		channel.setInviteOnly(modeType == MODE_TYPE_SET);
-		return (MODE_SET_INVITE_ONLY(user, channel, modeType == MODE_TYPE_SET));
+		return (MODE_SET_INVITE_ONLY(user, channelName, modeType == MODE_TYPE_SET));
 	}
 	if(mode == MODE_TOPIC)
 	{
@@ -418,13 +422,13 @@ std::string mode(User &user, const Message &message)
 		if(modeType == MODE_TYPE_SET)
 		{
 			if(channel.isUserOp(target))
-				return (ERR_USER_ALREADY_OPERATOR(user, channel, targetName));
+				return (ERR_USER_ALREADY_OPERATOR(user, channelName, targetName));
 			channel.addOperator(target);
 		}
 		else
 		{
 			if(channel.isUserOp(target))
-				return (ERR_USER_NOT_OPERATOR(user));
+				return (ERR_CHANNEL_NOT_OPERATOR(user, channelName));
 			channel.removeOperator(target);
 		}
 		return (MODE_SET_OP(user, channel, target, modeType == MODE_TYPE_SET));
