@@ -126,7 +126,7 @@ void Server::processClientSockets(void)
 			std::string &message = user.getNextMessage();
 			errno = 0;
 
-			std::cout << "SEND " << socket.getFd() << ": " << message << std::endl;
+			// std::cout << "SEND " << socket.getFd() << ": " << message << std::endl;
 
 			ssize_t sent = send(socket.getFd(), message.c_str(), message.length(), 0);
 

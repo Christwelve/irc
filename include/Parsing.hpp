@@ -176,7 +176,7 @@ std::string join(User &user, const Message &message)
 		channel.addOperator(user);
 
 		user.queue(JOIN_CHANNEL(user, channelName));
-		// user.queue(MODE_SET_OPERATOR(user, channelName, "+o", user.getNickname()));
+		user.queue(MODE_SET_OPERATOR(user, channelName, "+o", user.getNickname()));
 	}
 
 	return ("");
@@ -203,6 +203,7 @@ std::string part(User &user, const Message &message)
 
 	channel.removeUser(user);
 	channel.sendMessage(PART_CHANNEL(user, channelName, message.getTrailing()));
+	user.queue(PART_CHANNEL(user, channelName, message.getTrailing()));
 
 	if(channel.isEmpty())
 		channelManager.removeChannel(channel);
