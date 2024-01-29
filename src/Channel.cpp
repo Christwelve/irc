@@ -47,6 +47,9 @@ void Channel::addInvite(const User &user)
 
 void Channel::removeUser(const User &user)
 {
+	removeOperator(user);
+	removeInvite(user);
+
 	for (unsigned long i = 0; i < users_.size(); i++)
 	{
 		if (users_.at(i) == user)
@@ -54,7 +57,6 @@ void Channel::removeUser(const User &user)
 			users_.erase(users_.begin() + i);
 			return;
 		}
-
 	}
 }
 
@@ -185,4 +187,9 @@ std::string Channel::getUserList(void) const
 	}
 
 	return (list);
+}
+
+bool Channel::hasOperator(void) const
+{
+	return (operators_.size() > 0);
 }

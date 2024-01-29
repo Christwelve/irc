@@ -11,6 +11,22 @@ UserManager &UserManager::getInstance(void)
 	return instance;
 }
 
+bool UserManager::isValidNickname(const std::string &name)
+{
+	static const std::string validNicknameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-";
+
+	if (name.length() < 1 || name.length() > 50)
+		return false;
+
+	for (unsigned long i = 0; i < name.length(); i++)
+	{
+		if(validNicknameCharacters.find(name[i]) == std::string::npos)
+			return false;
+	}
+
+	return true;
+}
+
 void UserManager::createUserFromSocket(const Socket &socket)
 {
 	users_.push_back(User(socket));

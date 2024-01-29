@@ -25,7 +25,7 @@ class ChannelManager
 
 		void addUserToChannel(Channel &channel, const User &user);
 		void removeUserFromChannel(Channel &channel, const User &user);
-		void removeUserFromAllChannels(const User &user);
+		void removeUserFromAllChannels(const User &user, const std::string &quitMessage);
 };
 
 #endif

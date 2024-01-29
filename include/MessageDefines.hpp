@@ -20,17 +20,19 @@
 # define MODE_CHANNEL(user, channelName, modes) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + modes)
 # define MODE_INVITE_ONLY(user, channelName, mode) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode)
 # define MODE_TOPIC_RESTRICTED(user, channelName, mode) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode)
-# define MODE_SET_KEY_REQUIRED(user, channelName, mode, key) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode + "" + key)
+# define MODE_SET_KEY_REQUIRED(user, channelName, mode, key) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode + " " + key)
 # define MODE_SET_OPERATOR(user, channelName, mode, targetName) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode + " " + targetName)
 # define MODE_SET_USER_LIMIT(user, channelName, mode, limit) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode + " " + limit)
 # define MODE_UNSET_KEY_REQUIRED(user, channelName, mode) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode)
 # define MODE_UNSET_OPERATOR(user, channelName, mode, targetName) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode + " " + targetName)
 # define MODE_UNSET_USER_LIMIT(user, channelName, mode) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode)
+# define QUIT(user, message) ( ":" + user.getUserIdent() + " QUIT :" + message)
 
 # define MODE_CHANNEL_INFO(user, channelName, activeModes) ( ":" + std::string(SERVER_NAME) + " 324 " + user.getNickname() + " " + channelName + " " + activeModes)
 
-# define USER_WELCOME(user) ( ":" + std::string(SERVER_NAME) + " 001 " + user.getNickname() + " :Ey Mate! Welcome to sad irc")
-// # define USER_WELCOME(user) ( ":" + std::string(SERVER_NAME) + " 001 " + user.getNickname() + " :Ey Mate! Welcome to 👁️  ®️  🌊")
+
+// # define USER_WELCOME(user) ( ":" + std::string(SERVER_NAME) + " 001 " + user.getNickname() + " :Ey Mate! Welcome to sad irc")
+# define USER_WELCOME(user) ( ":" + std::string(SERVER_NAME) + " 001 " + user.getNickname() + " :Ey Mate! Welcome to 👁️  ®️  🌊")
 # define USER_WELCOME_002(user) ( ":" + std::string(SERVER_NAME) + " 002 " + user.getNickname() + " :Your host is " + std::string(SERVER_NAME) + ", running version 1.0")
 # define USER_WELCOME_005(user) ( ":" + std::string(SERVER_NAME) + " 005 " + user.getNickname() + " :CHANTYPES=# CHANMODES=,o,kl,it PREFIX=(o)@ NETWORK=" + std::string(SERVER_NAME))
 # define ERR_NICK_ALREADY_IN_USE(user, nickname) ( ":" + std::string(SERVER_NAME) + " 433 " + user.getNickname() + " " + nickname + " :Nickname is already in use")
@@ -43,9 +45,10 @@
 # define ERR_NOT_MEMBER_OF_CHANNEL(user, channelName) ( ":" + std::string(SERVER_NAME) + " 442 " + user.getNickname() + " " + channelName + " :You're not a member of this channel")
 # define ERR_CHANNEL_DOESNT_EXIST(user, channelName) ( ":" + std::string(SERVER_NAME) + " 403 " + user.getNickname() + " " + channelName + " :Channel doesn't exist")
 # define ERR_USER_NOT_OPERATOR(user, channelName) ( ":" + std::string(SERVER_NAME) + " 482 " + user.getNickname() + " " + channelName + " :You're not channel operator")
+# define ERR_TARGET_NOT_OPERATOR(targetName, channelName) ( ":" + std::string(SERVER_NAME) + " 482 " + targetName + " " + channelName + " :User not channel operator")
 # define ERR_CHANNEL_INVITE_ONLY(user, channelName) ( ":" + std::string(SERVER_NAME) + " 473 " + user.getNickname() + " " + channelName + " :Cannot join channel (+i)")
 # define ERR_USER_NOT_IN_CHANNEL(user, channelName) ( ":" + std::string(SERVER_NAME) + " 441 " + user.getNickname() + " " + channelName + " :User isn't in that channel")
-# define ERR_USER_ALREADY_MEMBER_OF_CHANNEL(user, channelName) ( ":" + std::string(SERVER_NAME) + " 443 " + user.getNickname() + channelName + ":User is already a member of channel")
+# define ERR_USER_ALREADY_MEMBER_OF_CHANNEL(user, channelName) ( ":" + std::string(SERVER_NAME) + " 443 " + user.getNickname() + channelName + " :User is already a member of channel")
 # define ERR_CHANNEL_IS_FULL(user, channelName) ( ":" + std::string(SERVER_NAME) + " 471 " + user.getNickname() + " " + channelName + " :Channel is full")
 
 

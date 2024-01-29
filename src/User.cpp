@@ -118,7 +118,7 @@ std::string User::getInputFromCommandBuffer(void)
 
 void User::remove(void)
 {
-	ChannelManager::getInstance().removeUserFromAllChannels(*this);
+	ChannelManager::getInstance().removeUserFromAllChannels(*this, "User died :(");
 	UserManager::getInstance().removeUser(*this);
 }
 

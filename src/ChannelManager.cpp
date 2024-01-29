@@ -1,4 +1,5 @@
 #include "ChannelManager.hpp"
+#include "MessageDefines.hpp"
 
 ChannelManager::ChannelManager(void) {}
 
@@ -62,8 +63,16 @@ void ChannelManager::removeUserFromChannel(Channel &channel, const User &user)
 	channel.removeUser(user);
 }
 
-void ChannelManager::removeUserFromAllChannels(const User &user)
+void ChannelManager::removeUserFromAllChannels(const User &user, const std::string &quitMessage)
 {
 	for (std::map<const std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); ++it)
-		it->second.removeUser(user);
+	{
+		Channel &channel = it->second;
+
+		if(!channel.hasUser(user))
+			continue;
+
+		channel.removeUser(user);
+		channel.sendMessage(QUIT(user, quitMessage));
+	}
 }

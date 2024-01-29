@@ -64,7 +64,6 @@ class Channel
 
 		void broadcastMessage(const User &user, const std::string &message);
 		void sendMessage(const std::string &message);
-		void sendCommand(const std::string &message);
 
 		bool isFull(void) const;
 		bool hasUser(const User &user) const;
@@ -73,6 +72,7 @@ class Channel
 		bool isUserOp(const User &user) const;
 		bool isUserInvited(const User &user) const;
 		std::string getUserList(void) const;
+		bool hasOperator(void) const;
 };
 
 
