@@ -3,6 +3,9 @@
 #include "Socket.hpp"
 #include "IRCError.hpp"
 
+#include <iostream>
+#include <arpa/inet.h>
+
 Socket::Socket(void)
 {
 	fd_ = -1;
@@ -29,7 +32,9 @@ Socket::Socket(int port)
 	if(bind(fd_, (struct sockaddr *)&address_, sizeof(address_)) == -1)
 		throw IRCError("Failed to bind socket to port");
 
-	if(listen(fd_, 3) == -1)
+	std::cout << "server running on ip " << inet_ntoa(address_.sin_addr) << std::endl;
+
+	if(listen(fd_, SOMAXCONN) == -1)
 		throw IRCError("Failed to listen on socket");
 
 	fcntl(fd_, F_SETFL, O_NONBLOCK);
@@ -41,11 +46,14 @@ Socket::Socket(int port)
 	isServer_ = true;
 }
 
-Socket::Socket(int serverFd, struct sockaddr_in *address)
+Socket::Socket(int serverFd, bool isServer)
 {
-	socklen_t len = sizeof(*address);
+	(void) isServer;
 
-	fd_ = accept(serverFd, (struct sockaddr *) address, &len);
+	memset(&address_, 0, sizeof(address_));
+    socklen_t addrlen = sizeof(address_);
+
+	fd_ = accept(serverFd, (struct sockaddr *) &address_, &addrlen);
 	if (fd_ == -1)
 		throw IRCError("Failed to accept socket connection");
 
@@ -55,7 +63,6 @@ Socket::Socket(int serverFd, struct sockaddr_in *address)
 	pollfd_.events = POLLIN | POLLOUT;
 	pollfd_.revents = 0;
 
-	memset(&address_, 0, sizeof(address_));
 	isServer_ = false;
 }
 
@@ -86,10 +93,12 @@ int Socket::getFd(void) const
 
 struct sockaddr_in *Socket::getAddress(void) const
 {
-	if(!isServer_)
-		throw IRCError("Getting address of client socket is not permitted");
-
 	return ((struct sockaddr_in *) &address_);
+}
+
+std::string Socket::getIp(void) const
+{
+	return (inet_ntoa(address_.sin_addr));
 }
 
 struct pollfd &Socket::getPollFd(void) const

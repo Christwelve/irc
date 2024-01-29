@@ -47,6 +47,9 @@ void Channel::addInvite(const User &user)
 
 void Channel::removeUser(const User &user)
 {
+	removeOperator(user);
+	removeInvite(user);
+
 	for (unsigned long i = 0; i < users_.size(); i++)
 	{
 		if (users_.at(i) == user)
@@ -54,7 +57,6 @@ void Channel::removeUser(const User &user)
 			users_.erase(users_.begin() + i);
 			return;
 		}
-
 	}
 }
 
@@ -86,11 +88,11 @@ void Channel::removeInvite(const User &user)
 
 
 // CONTAINER GETTERS
-const std::vector<User> &Channel::getUsers(void) const { return (users_); }
+std::vector<User> &Channel::getUsers(void) { return (users_); }
 
-const std::vector<User> &Channel::getOperators(void) const { return (operators_); }
+std::vector<User> &Channel::getOperators(void) { return (operators_); }
 
-const std::vector<User> &Channel::getInvites(void) const { return (invites_); }
+std::vector<User> &Channel::getInvites(void) { return (invites_); }
 
 
 // CHANNEL MODIFIERS
@@ -126,12 +128,24 @@ bool Channel::isUserLimit(void) const { return (l_); }
 
 
 // CHANNEL MESSAGE
-void Channel::sendMessage(const User &user, const std::string &message)
+void Channel::broadcastMessage(const User &user, const std::string &message)
 {
 	for (unsigned long i = 0; i < users_.size(); i++)
 	{
-		if (users_.at(i) != user)
-			users_.at(i).queue(PRIVMSG_SEND_MESSAGE(user, name_, message));
+		User &target = UserManager::getInstance().getUserByNickname(users_.at(i).getNickname());
+
+		if (target != user)
+			target.queue(PRIVMSG_SEND_MESSAGE(user, name_, message));
+	}
+}
+
+void Channel::sendMessage(const std::string &message)
+{
+	for (unsigned long i = 0; i < users_.size(); i++)
+	{
+		User &target = UserManager::getInstance().getUserByNickname(users_.at(i).getNickname());
+
+		target.queue(message);
 	}
 }
 
@@ -157,4 +171,25 @@ bool Channel::isUserOp(const User &user) const
 bool Channel::isUserInvited(const User &user) const
 {
 	return (std::find(invites_.begin(), invites_.end(), user) != invites_.end());
+}
+
+std::string Channel::getUserList(void) const
+{
+	std::string list;
+
+	for (unsigned long i = 0; i < users_.size(); i++)
+	{
+		User user = users_.at(i);
+
+		list += i == 0 ? "" : " ";
+		list += isUserOp(user) ? "@" : "";
+		list += user.getNickname();
+	}
+
+	return (list);
+}
+
+bool Channel::hasOperator(void) const
+{
+	return (operators_.size() > 0);
 }

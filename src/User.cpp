@@ -1,5 +1,6 @@
 #include "User.hpp"
 #include "Server.hpp"
+#include "ChannelManager.hpp"
 #include "UserManager.hpp"
 
 User::User(const Socket &socket): socket_(socket), state_(USER_EXPECTS_PASS), nickname_(""), username_(""), realname_(""), commandBuffer_("") {}
@@ -38,7 +39,7 @@ const std::string &User::getRealname(void) const
 
 std::string User::getUserIdent(void) const
 {
-	return (nickname_ + "!" + username_ + "@" + Server::getInstance().getHostIp());
+	return (nickname_ + "!" + username_ + "@" + socket_.getIp());
 }
 
 bool User::hasState(UserState state) const
@@ -69,7 +70,7 @@ void User::appendCommandBuffer(const std::string &partialCommand)
 
 void User::queue(const std::string &message)
 {
-	std::cout << "TO " << nickname_ << ": " << message << std::endl;
+	std::cout << "TO " << nickname_ << " (" << socket_.getFd() << "): " << message << std::endl;
 	messageQueue_.push(message + "\r\n");
 }
 
@@ -117,6 +118,7 @@ std::string User::getInputFromCommandBuffer(void)
 
 void User::remove(void)
 {
+	ChannelManager::getInstance().removeUserFromAllChannels(*this, "User died :(");
 	UserManager::getInstance().removeUser(*this);
 }
 

@@ -40,9 +40,9 @@ class Channel
 		void removeOperator(const User &user);
 		void removeInvite(const User &user);
 
-		const std::vector<User> &getUsers(void) const;
-		const std::vector<User> &getOperators(void) const;
-		const std::vector<User> &getInvites(void) const;
+		std::vector<User> &getUsers(void);
+		std::vector<User> &getOperators(void);
+		std::vector<User> &getInvites(void);
 
 		void setKey(const std::string &key);
 		void setTopic(const std::string &topic);
@@ -62,7 +62,8 @@ class Channel
 		bool isKeyRequired(void) const;
 		bool isUserLimit(void) const;
 
-		void sendMessage(const User &user, const std::string &message);
+		void broadcastMessage(const User &user, const std::string &message);
+		void sendMessage(const std::string &message);
 
 		bool isFull(void) const;
 		bool hasUser(const User &user) const;
@@ -70,6 +71,8 @@ class Channel
 		bool isKeyValid(const std::string &key) const;
 		bool isUserOp(const User &user) const;
 		bool isUserInvited(const User &user) const;
+		std::string getUserList(void) const;
+		bool hasOperator(void) const;
 };
 
 

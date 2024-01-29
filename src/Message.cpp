@@ -10,7 +10,7 @@ Message::Message(const std::string &input)
 
     if (pos != std::string::npos)
 	{
-        trailing_ = str.substr(pos + 2);
+        trailing_ = str.substr(pos + 1);
         str = str.substr(0, pos);
     }
 

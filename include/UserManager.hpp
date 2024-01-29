@@ -17,6 +17,7 @@ class UserManager
 
 	public:
 		static UserManager &getInstance(void);
+		static bool isValidNickname(const std::string &name);
 
 		~UserManager();
 

@@ -1,4 +1,5 @@
 #include "ChannelManager.hpp"
+#include "MessageDefines.hpp"
 
 ChannelManager::ChannelManager(void) {}
 
@@ -55,8 +56,6 @@ void ChannelManager::removeChannel(const Channel &channel)
 void ChannelManager::addUserToChannel(Channel &channel, const User &user)
 {
 	channel.addUser(user);
-	// TODO: add proper channel join message
-	channel.sendMessage(user, user.getNickname() + " has joined the channel");
 }
 
 void ChannelManager::removeUserFromChannel(Channel &channel, const User &user)
@@ -64,13 +63,16 @@ void ChannelManager::removeUserFromChannel(Channel &channel, const User &user)
 	channel.removeUser(user);
 }
 
-void ChannelManager::removeUserFromAllChannels(const User &user)
+void ChannelManager::removeUserFromAllChannels(const User &user, const std::string &quitMessage)
 {
 	for (std::map<const std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); ++it)
-		it->second.removeUser(user);
-}
+	{
+		Channel &channel = it->second;
 
-void ChannelManager::sendMessageToChannel(Channel &channel, const User &user, const std::string &message)
-{
-	channel.sendMessage(user, message);
+		if(!channel.hasUser(user))
+			continue;
+
+		channel.removeUser(user);
+		channel.sendMessage(QUIT(user, quitMessage));
+	}
 }

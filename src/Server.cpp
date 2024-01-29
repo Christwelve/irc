@@ -6,6 +6,9 @@
 #include "UserManager.hpp"
 #include "Parsing.hpp"
 
+#include <iomanip>
+#include <stdio.h>
+
 Server::Server(void)
 {
 	signal(SIGPIPE, SIG_IGN);
@@ -20,7 +23,6 @@ void Server::initServer(int port, const std::string &password)
 {
 	password_ = password;
 	socket_ = Socket(port);
-	host_ = inet_ntoa(socket_.getAddress()->sin_addr);
 
 	std::cout << "server listening on port " << port << std::endl;
 }
@@ -114,13 +116,6 @@ void Server::processClientSockets(void)
 				{
 					std::cout << "received partial from socket " << socket.getFd() << ": " << msg << std::endl;
 				}
-
-
-				if(msg == "die")
-				{
-					shutdownServer();
-					running_ = false;
-				}
 			}
 		}
 		if(socket.hasPollOut())
@@ -130,6 +125,9 @@ void Server::processClientSockets(void)
 
 			std::string &message = user.getNextMessage();
 			errno = 0;
+
+			// std::cout << "SEND " << socket.getFd() << ": " << message << std::endl;
+
 			ssize_t sent = send(socket.getFd(), message.c_str(), message.length(), 0);
 
 			if(errno != EWOULDBLOCK && errno != EAGAIN && errno != 0)
@@ -141,6 +139,28 @@ void Server::processClientSockets(void)
 				user.remove();
 				continue;
 			}
+
+			// // const char *t = message.c_str();
+			// std::string t = message;
+
+			// // printf("%s\n", t);
+
+			// for(unsigned long i = 0; i < message.length(); ++i)
+			// {
+			// 	std::cout << t[i] << "  ";
+			// }
+
+			// std::cout << std::endl;
+
+			// for(unsigned long i = 0; i < message.length(); ++i)
+			// {
+			// 	std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)t[i] << std::dec << " ";
+			// }
+
+			// std::cout << std::endl;
+
+
+			// std::cout << "PARTIAL TO " << socket.getFd() << ": " << t << std::endl;
 
 			message.erase(0, sent);
 			if(message.length() == 0)
@@ -157,7 +177,7 @@ void Server::shutdownServer(void)
 
 	while(socket_.hasPollIn())
 	{
-		Socket new_client(socket_.getFd(), socket_.getAddress());
+		Socket new_client(socket_.getFd(), true);
 		new_client.close();
 	}
 
@@ -182,11 +202,6 @@ void Server::signalHandler(int signal)
 bool Server::isPasswordValid(const std::string &password) const
 {
 	return (password == password_);
-}
-
-const std::string &Server::getHostIp(void) const
-{
-	return (host_);
 }
 
 Server &Server::getInstance(void)

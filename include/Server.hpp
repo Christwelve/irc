@@ -34,13 +34,11 @@ class Server
 		static void signalHandler(int signal);
 
 		bool isPasswordValid(const std::string &password) const;
-		const std::string &getHostIp(void) const;
 
 	private:
 		Server(void);
 		std::string password_;
 		Socket socket_;
-		std::string host_;
 		std::vector<Socket> clients_;
 		bool running_;
 
