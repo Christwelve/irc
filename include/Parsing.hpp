@@ -120,7 +120,11 @@ std::string userCmd(User &user, const Message &message)
 	user.setUsername(message.getParamAt(0), message.getParamAt(2));
 	user.setState(USER_REGISTERED);
 
-	return (USER_WELCOME(user));
+	user.queue(USER_WELCOME(user));
+	user.queue(USER_WELCOME_002(user));
+	user.queue(USER_WELCOME_005(user));
+
+	return ("");
 }
 
 std::string join(User &user, const Message &message)
@@ -137,8 +141,9 @@ std::string join(User &user, const Message &message)
 	if(channelManager.hasChannelWithName(channelName))
 	{
 		Channel &channel = channelManager.getChannelByName(channelName);
+
 		if(channel.hasUser(user))
-			return (ERR_USER_IS_ALREADY_ON_CHANNEL(user, channelName));
+			return (ERR_USER_ALREADY_MEMBER_OF_CHANNEL(user, channelName));
 		if(channel.isFull())
 			return (ERR_CHANNEL_IS_FULL(user, channelName));
 		if(channel.isInviteOnly() && !channel.isUserInvited(user))
@@ -148,20 +153,30 @@ std::string join(User &user, const Message &message)
 
 		channel.addUser(user);
 		channel.removeInvite(user);
-		channel.sendMessage(JOIN_CHANNEL(user, channelName));
 
-		return ("");
+		std::vector<User> &users = channel.getUsers();
+
+		for(unsigned long i = 0; i < users.size(); i++)
+		{
+			User &target = UserManager::getInstance().getUserByNickname(users.at(i).getNickname());
+
+			target.queue(JOIN_CHANNEL(user, channelName));
+		}
+
+		user.queue(JOIN_CHANNEL_SEND_LIST(user, channelName, channel.getUserList()));
+		user.queue(JOIN_CHANNEL_SEND_LIST_END(user, channelName));
 	}
 	else
 	{
 		if(!ChannelManager::isValidChannelName(channelName))
 			return (ERR_CHANNEL_INVALID_NAME(user, channelName));
 		Channel &channel = channelManager.createChannelWithName(channelName);
+
 		channel.addUser(user);
 		channel.addOperator(user);
 
 		user.queue(JOIN_CHANNEL(user, channelName));
-		return (MODE_SET_OPERATOR(user, channelName, "+o", user.getNickname()));
+		// user.queue(MODE_SET_OPERATOR(user, channelName, "+o", user.getNickname()));
 	}
 
 	return ("");
@@ -226,7 +241,7 @@ std::string privmsg(User &user, const Message &message)
 
 		User &target = userManager.getUserByNickname(targetName);
 
-		target.queue(PRIVMSG_SEND_MESSAGE(target, target.getNickname(), message.getTrailing()));
+		target.queue(PRIVMSG_SEND_MESSAGE(target, user.getNickname(), message.getTrailing()));
 	}
 
 	return ("");
@@ -293,6 +308,10 @@ std::string invite(User &user, const Message &message)
 		return (ERR_USER_NOT_OPERATOR(user, channelName));
 
 	User &target = userManager.getUserByNickname(targetName);
+
+	// TODO: implement this
+	// if(channel.isUserInvited(target))
+	// 	return (ERR_USER_ALREADY_INVITED_TO_CHANNEL(user, channelName));
 
 	channel.addInvite(target);
 
@@ -363,8 +382,10 @@ std::string mode(User &user, const Message &message)
 
 	if(!user.isRegistered())
 		return (ERR_USER_NOT_REGISTERED(user));
-	if(message.getParamCount() < 2)
+
+	if(message.getParamCount() < 1)
 		return (ERR_NEED_MORE_PARAMS(user, "MODE"));
+
 
 	const std::string &channelName = message.getParamAt(0);
 
@@ -375,6 +396,28 @@ std::string mode(User &user, const Message &message)
 
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, channelName));
+
+	if(message.getParamCount() == 1)
+	{
+		std::string activeModes = "+";
+
+		if(channel.isInviteOnly())
+			activeModes += "i";
+		if(channel.isTopicRestricted())
+			activeModes += "t";
+		if(channel.isKeyRequired())
+			activeModes += "k";
+		if(channel.isUserOp(user))
+			activeModes += "o";
+		if(channel.isUserLimit())
+			activeModes += "l";
+
+		return (MODE_CHANNEL_INFO(user, channelName, activeModes));
+	}
+
+	if(message.getParamCount() < 2)
+		return (ERR_NEED_MORE_PARAMS(user, "MODE"));
+
 	if(!channel.isUserOp(user))
 		return (ERR_USER_NOT_OPERATOR(user, channelName));
 
