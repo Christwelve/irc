@@ -126,13 +126,19 @@ bool Channel::isUserLimit(void) const { return (l_); }
 
 
 // CHANNEL MESSAGE
-void Channel::sendMessage(const User &user, const std::string &message)
+void Channel::broadcastMessage(const User &user, const std::string &message)
 {
 	for (unsigned long i = 0; i < users_.size(); i++)
 	{
 		if (users_.at(i) != user)
 			users_.at(i).queue(PRIVMSG_SEND_MESSAGE(user, name_, message));
 	}
+}
+
+void Channel::sendMessage(const std::string &message)
+{
+	for (unsigned long i = 0; i < users_.size(); i++)
+		users_.at(i).queue(message);
 }
 
 bool Channel::isFull(void) const { return (users_.size() >= limit_); }

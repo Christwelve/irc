@@ -18,13 +18,14 @@ class Socket
 	public:
 		Socket(void);
 		Socket(int port);
-		Socket(int serverFd, struct sockaddr_in *address);
+		Socket(int serverFd, bool isClient);
 		Socket(const Socket &socket);
 		Socket &operator=(const Socket &socket);
 		~Socket();
 
 		int getFd(void) const;
 		struct sockaddr_in *getAddress(void) const;
+		std::string getIp(void) const;
 		struct pollfd &getPollFd(void) const;
 		void setState(short state);
 

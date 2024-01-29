@@ -145,10 +145,12 @@ std::string join(User &user, const Message &message)
 			return (ERR_CHANNEL_INVITE_ONLY(user, channelName));
 		if(channel.isKeyRequired() && channel.isKeyValid(message.getParamAt(1)))
 			return (ERR_CHANNEL_INVALID_KEY(user, channelName));
+
 		channel.addUser(user);
 		channel.removeInvite(user);
+		channel.sendMessage(JOIN_CHANNEL(user, channelName));
 
-		return (JOIN_CHANNEL(user, channelName));
+		return ("");
 	}
 	else
 	{
@@ -183,12 +185,14 @@ std::string part(User &user, const Message &message)
 
 	if(!channel.hasUser(user))
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, channelName));
+
 	channel.removeUser(user);
-	channel.sendMessage(user, "User " + user.getNickname() + " has left the channel" + (message.hasTrailing() ? " (" + message.getTrailing() + ")" : ""));
+	channel.sendMessage(PART_CHANNEL(user, channelName, message.getTrailing()));
+
 	if(channel.isEmpty())
 		channelManager.removeChannel(channel);
 
-	return (PART_CHANNEL(user, channelName, message.getTrailing()));
+	return ("");
 }
 
 std::string privmsg(User &user, const Message &message)
@@ -198,7 +202,7 @@ std::string privmsg(User &user, const Message &message)
 
 	if(!user.isRegistered())
 		return (ERR_USER_NOT_REGISTERED(user));
-	if(message.getParamCount() < 2)
+	if(message.getParamCount() < 1)
 		return (ERR_NEED_MORE_PARAMS(user, "PRIVMSG"));
 
 	const std::string &targetName = message.getParamAt(0);
@@ -213,7 +217,7 @@ std::string privmsg(User &user, const Message &message)
 		if(!channel.hasUser(user))
 			return (ERR_NOT_MEMBER_OF_CHANNEL(user, targetName));
 
-		channel.sendMessage(user, message.getTrailing());
+		channel.broadcastMessage(user, message.getTrailing());
 	}
 	else
 	{
@@ -259,7 +263,7 @@ std::string kick(User &user, const Message &message)
 		return (ERR_NOT_MEMBER_OF_CHANNEL(user, targetName));
 
 	channel.removeUser(target);
-	channel.sendMessage(user, "User " + target.getNickname() + " has been kicked from the channel" + (message.hasTrailing() ? " (" + message.getTrailing() + ")" : ""));
+	channel.sendMessage(KICK_USER(user, channelName, targetName, message.getTrailing()));
 
 	return ("");
 }

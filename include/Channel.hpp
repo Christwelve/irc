@@ -62,7 +62,8 @@ class Channel
 		bool isKeyRequired(void) const;
 		bool isUserLimit(void) const;
 
-		void sendMessage(const User &user, const std::string &message);
+		void broadcastMessage(const User &user, const std::string &message);
+		void sendMessage(const std::string &message);
 
 		bool isFull(void) const;
 		bool hasUser(const User &user) const;

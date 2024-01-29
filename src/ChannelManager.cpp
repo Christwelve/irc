@@ -55,8 +55,6 @@ void ChannelManager::removeChannel(const Channel &channel)
 void ChannelManager::addUserToChannel(Channel &channel, const User &user)
 {
 	channel.addUser(user);
-	// TODO: add proper channel join message
-	channel.sendMessage(user, user.getNickname() + " has joined the channel");
 }
 
 void ChannelManager::removeUserFromChannel(Channel &channel, const User &user)
@@ -68,9 +66,4 @@ void ChannelManager::removeUserFromAllChannels(const User &user)
 {
 	for (std::map<const std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); ++it)
 		it->second.removeUser(user);
-}
-
-void ChannelManager::sendMessageToChannel(Channel &channel, const User &user, const std::string &message)
-{
-	channel.sendMessage(user, message);
 }

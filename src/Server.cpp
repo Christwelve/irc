@@ -20,7 +20,6 @@ void Server::initServer(int port, const std::string &password)
 {
 	password_ = password;
 	socket_ = Socket(port);
-	host_ = inet_ntoa(socket_.getAddress()->sin_addr);
 
 	std::cout << "server listening on port " << port << std::endl;
 }
@@ -114,13 +113,6 @@ void Server::processClientSockets(void)
 				{
 					std::cout << "received partial from socket " << socket.getFd() << ": " << msg << std::endl;
 				}
-
-
-				if(msg == "die")
-				{
-					shutdownServer();
-					running_ = false;
-				}
 			}
 		}
 		if(socket.hasPollOut())
@@ -157,7 +149,7 @@ void Server::shutdownServer(void)
 
 	while(socket_.hasPollIn())
 	{
-		Socket new_client(socket_.getFd(), socket_.getAddress());
+		Socket new_client(socket_.getFd(), true);
 		new_client.close();
 	}
 
@@ -182,11 +174,6 @@ void Server::signalHandler(int signal)
 bool Server::isPasswordValid(const std::string &password) const
 {
 	return (password == password_);
-}
-
-const std::string &Server::getHostIp(void) const
-{
-	return (host_);
 }
 
 Server &Server::getInstance(void)
