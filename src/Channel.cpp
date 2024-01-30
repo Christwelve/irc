@@ -1,6 +1,7 @@
 #include "Channel.hpp"
 #include "UserManager.hpp"
 #include "MessageDefines.hpp"
+#include <algorithm>
 
 Channel::Channel(const std::string &name)
 {
