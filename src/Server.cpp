@@ -4,7 +4,7 @@
 #include "Server.hpp"
 #include "IRCError.hpp"
 #include "UserManager.hpp"
-#include "Parsing.hpp"
+#include "Command.hpp"
 
 #include <iomanip>
 #include <stdio.h>
@@ -111,7 +111,7 @@ void Server::processClientSockets(void)
 
 					std::cout << "FROM " << socket.getFd() << ": " << input << std::endl;
 
-					Parsing(user, msg);
+					Command::parseInput(user, msg);
 				}
 				else
 				{

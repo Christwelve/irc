@@ -1,9 +1,8 @@
-#include "Parsing.hpp"
-#include "MessageDefines.hpp"
 #include "Command.hpp"
+#include "MessageDefines.hpp"
 
 
-Parsing::Parsing(User &user, std::string input)
+void Command::parseInput(User &user, std::string input)
 {
 	static std::map<std::string, CommandFunc> commandMap = getCommandMap();
 
@@ -28,7 +27,7 @@ Parsing::Parsing(User &user, std::string input)
 }
 
 
-std::map <std::string, CommandFunc> Parsing::getCommandMap()
+std::map <std::string, CommandFunc> Command::getCommandMap()
 {
 	std::map<std::string, CommandFunc> map;
 
@@ -48,5 +47,3 @@ std::map <std::string, CommandFunc> Parsing::getCommandMap()
 
 	return (map);
 }
-
-Parsing::~Parsing(){}

@@ -1,5 +1,5 @@
 #include <string>
-#include "Parsing.hpp"
+#include <map>
 #include "User.hpp"
 #include "Message.hpp"
 
@@ -20,8 +20,14 @@ enum ModeType
 	MODE_TYPE_INVALID
 };
 
+typedef std::string (*CommandFunc)(User&, const Message&);
+
+
 class Command {
 public:
+	static void parseInput(User &user, std::string input);
+	static std::map<std::string, CommandFunc> getCommandMap();
+
     static std::string pass(User &user, const Message &message);
 	static std::string ping(User &user, const Message &message);
 	static std::string cap(User &user, const Message &message);
