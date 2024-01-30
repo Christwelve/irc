@@ -2,7 +2,7 @@
 #include "UserManager.hpp"
 #include "ChannelManager.hpp"
 #include "MessageDefines.hpp"
-
+#include <stdlib.h>
 
 Mode getModeFromString(const std::string &str)
 {
@@ -166,7 +166,7 @@ std::string Command::mode(User &user, const Message &message)
 
 		if(modeType == MODE_TYPE_SET)
 		{
-			int limit = std::atoi(message.getParamAt(2).c_str());
+			int limit = atoi(message.getParamAt(2).c_str());
 
 			if(limit < 1)
 				return (ERR_INVALID_PARAM(user, message.getParamAt(2)));

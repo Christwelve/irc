@@ -41,10 +41,10 @@ void Server::runServer(void)
 
 void Server::pollSockets(void)
 {
-	UserManager &userManager = UserManager::getInstance();
-	struct pollfd *fds = userManager.getPollFdsWithServerSocket(socket_);
+    UserManager &userManager = UserManager::getInstance();
+    struct pollfd *fds = userManager.getPollFdsWithServerSocket(socket_);
 
-	int pollResult;
+    int pollResult;
     do {
         pollResult = poll(fds, userManager.getUserCount() + 1, -1);
     } while (pollResult == -1 && errno == EINTR);
@@ -52,14 +52,7 @@ void Server::pollSockets(void)
     if(pollResult == -1)
         throw IRCError("Failed to poll sockets");
 
-	// int pollResult = poll(fds, userManager.getUserCount() + 1, -1);
-
-	// if(pollResult == -1)
-	// 	throw IRCError("Failed to poll sockets");
-
-	// userManager.setPollFdsWithServerSocket(socket_, fds);
-
-	delete[] fds;
+    delete[] fds;
 }
 
 void Server::listenForNewClients(void)
@@ -137,7 +130,7 @@ void Server::processClientSockets(void)
 			ssize_t sent = send(socket.getFd(), message.c_str(), message.length(), 0);
 
 			if(errno != EWOULDBLOCK && errno != EAGAIN && errno != 0)
-				throw IRCError("Failed to send message to socket " + std::to_string(socket.getFd()));
+				throw IRCError("Failed to send message to socket ");
 
 			if(sent == -1)
 			{
