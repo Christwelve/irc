@@ -110,7 +110,7 @@ void Server::processClientSockets(void)
 
 					std::cout << "FROM " << socket.getFd() << ": " << input << std::endl;
 
-					parseInput(user, msg);
+					Parsing(user, msg);
 				}
 				else
 				{
@@ -126,8 +126,6 @@ void Server::processClientSockets(void)
 			std::string &message = user.getNextMessage();
 			errno = 0;
 
-			// std::cout << "SEND " << socket.getFd() << ": " << message << std::endl;
-
 			ssize_t sent = send(socket.getFd(), message.c_str(), message.length(), 0);
 
 			if(errno != EWOULDBLOCK && errno != EAGAIN && errno != 0)
@@ -139,28 +137,6 @@ void Server::processClientSockets(void)
 				user.remove();
 				continue;
 			}
-
-			// // const char *t = message.c_str();
-			// std::string t = message;
-
-			// // printf("%s\n", t);
-
-			// for(unsigned long i = 0; i < message.length(); ++i)
-			// {
-			// 	std::cout << t[i] << "  ";
-			// }
-
-			// std::cout << std::endl;
-
-			// for(unsigned long i = 0; i < message.length(); ++i)
-			// {
-			// 	std::cout << std::setw(2) << std::setfill('0') << std::hex << (int)t[i] << std::dec << " ";
-			// }
-
-			// std::cout << std::endl;
-
-
-			// std::cout << "PARTIAL TO " << socket.getFd() << ": " << t << std::endl;
 
 			message.erase(0, sent);
 			if(message.length() == 0)

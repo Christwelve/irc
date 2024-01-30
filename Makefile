@@ -4,6 +4,7 @@ NAME=ircserv
 SRC_DIR=src
 OBJ_DIR=obj
 SRC=$(wildcard $(SRC_DIR)/*.cpp)
+SRC+=$(wildcard $(SRC_DIR)/commands/*.cpp)
 OBJ=$(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
 HEADERS=$(wildcard include/*.hpp)
 INCLUDE=-Iinclude
