@@ -130,7 +130,7 @@ void Server::processClientSockets(void)
 			ssize_t sent = send(socket.getFd(), message.c_str(), message.length(), 0);
 
 			if(errno != EWOULDBLOCK && errno != EAGAIN && errno != 0)
-				throw IRCError("Failed to send message to socket ");
+				throw IRCError("Failed to send message to socket");
 
 			if(sent == -1)
 			{
