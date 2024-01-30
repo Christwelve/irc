@@ -44,12 +44,20 @@ void Server::pollSockets(void)
 	UserManager &userManager = UserManager::getInstance();
 	struct pollfd *fds = userManager.getPollFdsWithServerSocket(socket_);
 
-	int pollResult = poll(fds, userManager.getUserCount() + 1, -1);
+	int pollResult;
+    do {
+        pollResult = poll(fds, userManager.getUserCount() + 1, -1);
+    } while (pollResult == -1 && errno == EINTR);
 
-	if(pollResult == -1)
-		throw IRCError("Failed to poll sockets");
+    if(pollResult == -1)
+        throw IRCError("Failed to poll sockets");
 
-	userManager.setPollFdsWithServerSocket(socket_, fds);
+	// int pollResult = poll(fds, userManager.getUserCount() + 1, -1);
+
+	// if(pollResult == -1)
+	// 	throw IRCError("Failed to poll sockets");
+
+	// userManager.setPollFdsWithServerSocket(socket_, fds);
 
 	delete[] fds;
 }
