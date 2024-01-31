@@ -52,7 +52,7 @@ void Server::pollSockets(void)
     if(pollResult == -1)
         throw IRCError("Failed to poll sockets");
 
-	userManager.setPollFdsWithServerSocket(socket_, fds);
+    userManager.setPollFdsWithServerSocket(socket_, fds);
 
     delete[] fds;
 }
