@@ -24,7 +24,7 @@ void Server::initServer(int port, const std::string &password)
 	password_ = password;
 	socket_ = Socket(port);
 
-	std::cout << "server listening on port " << port << std::endl;
+	std::cout << GREEN << "Server listening " << CLEAR << "on port " << port << std::endl;
 }
 
 void Server::runServer(void)
@@ -103,7 +103,6 @@ void Server::processClientSockets(void)
 
 				user.appendCommandBuffer(msg);
 
-
 				if(user.hasInput())
 				{
 					std::string input = user.getInputFromCommandBuffer();
@@ -113,7 +112,7 @@ void Server::processClientSockets(void)
 
 					std::cout << "FROM " << socket.getFd() << ": " << input << std::endl;
 
-					Command::parseInput(user, msg);
+					Command::parseInput(user, input);
 				}
 				else
 				{
@@ -151,7 +150,7 @@ void Server::processClientSockets(void)
 
 void Server::shutdownServer(void)
 {
-	std::cout << std::endl << "Shutting down server..." << std::endl;
+	std::cout << std::endl << RED << "Shutting down" << CLEAR << " server..." << std::endl;
 
 	running_ = false;
 

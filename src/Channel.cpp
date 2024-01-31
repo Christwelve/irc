@@ -30,7 +30,6 @@ Channel::Channel(const std::string &name, const std::string &key)
 Channel::~Channel() { return; }
 
 
-// CONTAINER MODIFIERS
 void Channel::addUser(const User &user)
 {
 	users_.push_back(user);
@@ -88,7 +87,6 @@ void Channel::removeInvite(const User &user)
 }
 
 
-// CONTAINER GETTERS
 std::vector<User> &Channel::getUsers(void) { return (users_); }
 
 std::vector<User> &Channel::getOperators(void) { return (operators_); }
@@ -96,7 +94,6 @@ std::vector<User> &Channel::getOperators(void) { return (operators_); }
 std::vector<User> &Channel::getInvites(void) { return (invites_); }
 
 
-// CHANNEL MODIFIERS
 void Channel::setKey(const std::string &key) { key_ = key; }
 
 void Channel::setTopic(const std::string &topic) { topic_ = topic; }
@@ -112,7 +109,6 @@ void Channel::setKeyRequired(bool flag) { k_ = flag; }
 void Channel::setUserLimit(bool flag) { l_ = flag; }
 
 
-// CHANNEL GETTERS
 const std::string &Channel::getName(void) const { return (name_); }
 
 const std::string &Channel::getKey(void) const { return (key_); }
@@ -128,7 +124,6 @@ bool Channel::isKeyRequired(void) const { return (k_); }
 bool Channel::isUserLimit(void) const { return (l_); }
 
 
-// CHANNEL MESSAGE
 void Channel::broadcastMessage(const User &user, const std::string &message)
 {
 	for (unsigned long i = 0; i < users_.size(); i++)

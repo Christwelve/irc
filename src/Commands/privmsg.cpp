@@ -12,6 +12,8 @@ std::string Command::privmsg(User &user, const Message &message)
 		return (ERR_USER_NOT_REGISTERED(user));
 	if(message.getParamCount() < 1)
 		return (ERR_NEED_MORE_PARAMS(user, "PRIVMSG"));
+	if(!message.hasTrailing())
+		return (ERR_TRAILING_MISSING(user, "PRIVMSG"));
 
 	const std::string &targetName = message.getParamAt(0);
 

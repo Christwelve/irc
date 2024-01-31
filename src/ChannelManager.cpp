@@ -49,8 +49,7 @@ Channel &ChannelManager::getChannelByName(const std::string &name)
 
 void ChannelManager::removeChannel(const Channel &channel)
 {
-	// TODO: remove all users from channel
-	channels_.erase(channel.getName());
+    channels_.erase(channel.getName());
 }
 
 void ChannelManager::addUserToChannel(Channel &channel, const User &user)
@@ -65,7 +64,7 @@ void ChannelManager::removeUserFromChannel(Channel &channel, const User &user)
 
 void ChannelManager::removeUserFromAllChannels(const User &user, const std::string &quitMessage)
 {
-	for (std::map<const std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); ++it)
+	for (std::map<std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); ++it)
 	{
 		Channel &channel = it->second;
 

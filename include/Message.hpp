@@ -7,8 +7,8 @@
 class Message
 {
 	public:
-		Message(const std::string &str);		// Constructor
-		~Message();								// Destructor
+		Message(const std::string &str);
+		~Message();
 
 		const std::string &getCommand() const;
 		std::string getParamAt(unsigned long index) const;
