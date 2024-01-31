@@ -81,7 +81,7 @@ void Server::processClientSockets(void)
 
 		if(socket.hasPollIn())
 		{
-			char buffer[BUFFER_SIZE] = {0}; // Clear the buffer
+			char buffer[BUFFER_SIZE] = {0};
 			ssize_t valread = recv(socket.getFd(), buffer, BUFFER_SIZE - 1, 0);
 
 			if(valread < 0)
@@ -92,7 +92,6 @@ void Server::processClientSockets(void)
 			}
 			else if(valread == 0)
 			{
-				// Handle socket disconnection
 				std::cout << "socket " << socket.getFd() << " disconnected" << std::endl;
 				user.remove();
 				i--;
@@ -103,6 +102,7 @@ void Server::processClientSockets(void)
 				std::string msg(buffer);
 
 				user.appendCommandBuffer(msg);
+
 
 				if(user.hasInput())
 				{
@@ -118,6 +118,7 @@ void Server::processClientSockets(void)
 				else
 				{
 					std::cout << "received partial from socket " << socket.getFd() << ": " << msg << std::endl;
+					std::cout << "total buffer " << socket.getFd() << ": " << user.getInputFromCommandBuffer() << std::endl;
 				}
 			}
 		}

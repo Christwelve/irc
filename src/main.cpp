@@ -25,8 +25,6 @@ int main(int argc, char **argv)
 	{
 		int port = parsing(argc, argv);
 
-		std::cout << "port: " << port << std::endl;
-		std::cout << "password: " << argv[2] << std::endl;
 		Server &server = Server::getInstance();
 		server.initServer(port, argv[2]);
 		server.runServer();

@@ -25,13 +25,13 @@ class Server
 {
 	public:
 		static Server &getInstance(void);
+		static void signalHandler(int signal);
 
 		~Server();
 
 		void initServer(int port, const std::string &password);
 		void runServer(void);
 		void shutdownServer(void);
-		static void signalHandler(int signal);
 
 		bool isPasswordValid(const std::string &password) const;
 
