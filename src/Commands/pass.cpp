@@ -1,7 +1,6 @@
 #include "Command.hpp"
 #include "MessageDefines.hpp"
 #include "UserManager.hpp"
-#include "MessageDefines.hpp"
 
 
 std::string Command::pass(User &user, const Message &message)
@@ -14,7 +13,8 @@ std::string Command::pass(User &user, const Message &message)
 		return (ERR_UNKNOWN_COMMAND(user, "PASS"));
 	if(!Server::getInstance().isPasswordValid(message.getParamAt(0)))
 	{
-		UserManager::getInstance().removeUser(user);
+		send(user.getSocket().getFd(), ERR_PASS_INVALID(user).c_str(), ERR_PASS_INVALID(user).length(), 0);
+		user.remove();
 		return ("");
 	}
 

@@ -27,6 +27,7 @@
 # define MODE_UNSET_OPERATOR(user, channelName, mode, targetName) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode + " " + targetName)
 # define MODE_UNSET_USER_LIMIT(user, channelName, mode) ( ":" + user.getUserIdent() + " MODE " + channelName + " " + mode)
 # define QUIT(user, message) ( ":" + user.getUserIdent() + " QUIT :" + message)
+# define ERR_QUIT_SERVER(user) ( ":" + std::string(SERVER_NAME) + " QUIT: You left the server" + "\r\n")
 
 # define MODE_CHANNEL_INFO(user, channelName, activeModes) ( ":" + std::string(SERVER_NAME) + " 324 " + user.getNickname() + " " + channelName + " " + activeModes)
 
@@ -35,11 +36,14 @@
 # define USER_WELCOME(user) ( ":" + std::string(SERVER_NAME) + " 001 " + user.getNickname() + " :Ey Mate! Welcome to 👁️  ®️  🌊")
 # define USER_WELCOME_002(user) ( ":" + std::string(SERVER_NAME) + " 002 " + user.getNickname() + " :Your host is " + std::string(SERVER_NAME) + ", running version 1.0")
 # define USER_WELCOME_005(user) ( ":" + std::string(SERVER_NAME) + " 005 " + user.getNickname() + " :CHANTYPES=# CHANMODES=,o,kl,it PREFIX=(o)@ NETWORK=" + std::string(SERVER_NAME))
+# define ERR_TRAILING_MISSING(user, command) ( ":" + std::string(SERVER_NAME) + " 411 " + user.getNickname() + " " + command + " :Trailing missing")
+# define ERR_PASS_INVALID(user) ( ":" + std::string(SERVER_NAME) + " 464 " + user.getNickname() + " :Password incorrect\r\n")
 # define ERR_NICK_ALREADY_IN_USE(user, nickname) ( ":" + std::string(SERVER_NAME) + " 433 " + user.getNickname() + " " + nickname + " :Nickname is already in use")
 # define ERR_USER_DOESNT_EXIST(user, nickname) ( ":" + std::string(SERVER_NAME) + " 401 " + user.getNickname() + " " + nickname + " :This nickname doesn't exist")
 # define ERR_USER_NOT_REGISTERED(user) ( ":" + std::string(SERVER_NAME) + " 451 " + user.getNickname() + " :You have not registered")
 # define ERR_USER_ALREADY_REGISTERED(user) ( ":" + std::string(SERVER_NAME) + " 462 " + user.getNickname() + " :Already registered")
 # define ERR_USER_ALREADY_OPERATOR(user, channelName, targetName) ( ":" + std::string(SERVER_NAME) + " 512 " + user.getNickname() + " " + channelName + " " + targetName + " :is already channel operator")
+# define ERR_USER_ALREADT_INVITED_TO_CHANNEL(user, channelName) ( ":" + std::string(SERVER_NAME) + " 443 " + user.getNickname() + " " + channelName + " :is already invited to channel")
 # define ERR_CHANNEL_INVALID_NAME(user, channelName) ( ":" + std::string(SERVER_NAME) + " 480 " + user.getNickname() + " " + channelName + " :Invalid Channel Name")
 # define ERR_CHANNEL_INVALID_KEY(user, channelName) ( ":" + std::string(SERVER_NAME) + " 479 " + user.getNickname() + " " + channelName + " :Invalid Channel Key")
 # define ERR_NOT_MEMBER_OF_CHANNEL(user, channelName) ( ":" + std::string(SERVER_NAME) + " 442 " + user.getNickname() + " " + channelName + " :You're not a member of this channel")
@@ -58,18 +62,5 @@
 # define ERR_UNKNOWN_COMMAND(user, command) ( ":" + std::string(SERVER_NAME) + " 421 " + user.getNickname() + " " + command + " :Unknown command")
 # define ERR_INVALID_PARAM(user, param) ( ":" + std::string(SERVER_NAME) + " 421 " + user.getNickname() + " " + param + " :Invalid parameter")
 
-// TODO: Check if necessary:
-
-// ERR_NONICKNAMEGIVEN (431)
-// ERR_ERRONEUSNICKNAME (432)
-// ERR_ALREADYREGISTRED (462)
-// ERR_UNKNOWNMODE (472)
-// ERR_INVITEONLYCHAN (473)
-// ERR_BADCHANNELKEY (475)
-// ERR_BADCHANMASK (476)
-// ERR_ERRONEUSCHANNELNAME (480)
-// ERR_ERRONEUSCHANNELKEY (479)
-// ERR_GENERAL (700)
-// ERR_GENERAL_CHANNEL (701)
 
 #endif

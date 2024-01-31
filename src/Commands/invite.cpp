@@ -2,6 +2,7 @@
 #include "UserManager.hpp"
 #include "ChannelManager.hpp"
 #include "MessageDefines.hpp"
+#include "Channel.hpp"
 
 std::string Command::invite(User &user, const Message &message)
 {
@@ -29,9 +30,8 @@ std::string Command::invite(User &user, const Message &message)
 
 	User &target = userManager.getUserByNickname(targetName);
 
-	// TODO: implement this
-	// if(channel.isUserInvited(target))
-	// 	return (ERR_USER_ALREADY_INVITED_TO_CHANNEL(user, channelName));
+	if(channel.isUserInvited(target))
+		return (ERR_USER_ALREADT_INVITED_TO_CHANNEL(user, channelName));
 
 	channel.addInvite(target);
 

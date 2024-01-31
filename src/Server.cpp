@@ -24,7 +24,7 @@ void Server::initServer(int port, const std::string &password)
 	password_ = password;
 	socket_ = Socket(port);
 
-	std::cout << "server listening on port " << port << std::endl;
+	std::cout << GREEN << "Server listening " << CLEAR << "on port " << port << std::endl;
 }
 
 void Server::runServer(void)
@@ -81,7 +81,7 @@ void Server::processClientSockets(void)
 
 		if(socket.hasPollIn())
 		{
-			char buffer[BUFFER_SIZE] = {0}; // Clear the buffer
+			char buffer[BUFFER_SIZE] = {0};
 			ssize_t valread = recv(socket.getFd(), buffer, BUFFER_SIZE - 1, 0);
 
 			if(valread < 0)
@@ -92,7 +92,6 @@ void Server::processClientSockets(void)
 			}
 			else if(valread == 0)
 			{
-				// Handle socket disconnection
 				std::cout << "socket " << socket.getFd() << " disconnected" << std::endl;
 				user.remove();
 				i--;
@@ -113,11 +112,12 @@ void Server::processClientSockets(void)
 
 					std::cout << "FROM " << socket.getFd() << ": " << input << std::endl;
 
-					Command::parseInput(user, msg);
+					Command::parseInput(user, input);
 				}
 				else
 				{
 					std::cout << "received partial from socket " << socket.getFd() << ": " << msg << std::endl;
+					std::cout << "total buffer " << socket.getFd() << ": " << user.getInputFromCommandBuffer() << std::endl;
 				}
 			}
 		}
@@ -150,7 +150,7 @@ void Server::processClientSockets(void)
 
 void Server::shutdownServer(void)
 {
-	std::cout << std::endl << "Shutting down server..." << std::endl;
+	std::cout << std::endl << RED << "Shutting down" << CLEAR << " server..." << std::endl;
 
 	running_ = false;
 

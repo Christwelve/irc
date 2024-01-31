@@ -10,7 +10,7 @@ class ChannelManager
 	private:
 		ChannelManager(void);
 
-		std::map<const std::string, Channel> channels_;
+		std::map<std::string, Channel> channels_;
 
 	public:
 		static ChannelManager &getInstance(void);

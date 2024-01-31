@@ -32,8 +32,6 @@ Socket::Socket(int port)
 	if(bind(fd_, (struct sockaddr *)&address_, sizeof(address_)) == -1)
 		throw IRCError("Failed to bind socket to port");
 
-	std::cout << "server running on ip " << inet_ntoa(address_.sin_addr) << std::endl;
-
 	if(listen(fd_, SOMAXCONN) == -1)
 		throw IRCError("Failed to listen on socket");
 

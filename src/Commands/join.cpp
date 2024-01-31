@@ -20,8 +20,6 @@ std::string Command::join(User &user, const Message &message)
 	{
 		Channel &channel = channelManager.getChannelByName(channelName);
 
-		std::cout << "channel.isKeyRequired() = " << channel.isKeyRequired() << " key: " << channel.getKey() << std::endl;
-
 		if(channel.hasUser(user))
 			return (ERR_USER_ALREADY_MEMBER_OF_CHANNEL(user, channelName));
 		if(channel.isUserLimit() && channel.isFull())
