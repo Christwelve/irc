@@ -62,7 +62,7 @@ void Server::listenForNewClients(void)
 	if(!socket_.hasPollIn())
 		return;
 
-	Socket new_client(socket_.getFd(), socket_.getAddress());
+	Socket new_client(socket_.getFd(), false);
 
 	std::cout << "new client connected " << new_client.getFd() << std::endl;
 
@@ -88,6 +88,7 @@ void Server::processClientSockets(void)
 			{
 				std::cout << "Failed to send message to socket " << socket.getFd() << std::endl;
 				user.remove();
+				i--;
 				continue;
 			}
 			else if(valread == 0)
@@ -138,6 +139,7 @@ void Server::processClientSockets(void)
 			{
 				std::cerr << "Failed to send message to socket " << socket.getFd() << std::endl;
 				user.remove();
+				i--;
 				continue;
 			}
 

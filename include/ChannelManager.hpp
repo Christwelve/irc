@@ -2,6 +2,7 @@
 # define CHANNELMANAGER_HPP
 
 # include <map>
+# include <vector>
 # include <string>
 # include "Channel.hpp"
 
@@ -21,6 +22,7 @@ class ChannelManager
 		bool hasChannelWithName(const std::string &name) const;
 		Channel &createChannelWithName(const std::string &name);
 		Channel &getChannelByName(const std::string &name);
+		std::vector<std::string> getChannelNames(void);
 		void removeChannel(const Channel &channel);
 
 		void addUserToChannel(Channel &channel, const User &user);
