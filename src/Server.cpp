@@ -41,20 +41,23 @@ void Server::runServer(void)
 
 void Server::pollSockets(void)
 {
-    UserManager &userManager = UserManager::getInstance();
-    struct pollfd *fds = userManager.getPollFdsWithServerSocket(socket_);
+	UserManager &userManager = UserManager::getInstance();
+	struct pollfd *fds = userManager.getPollFdsWithServerSocket(socket_);
 
-    int pollResult;
-    do {
-        pollResult = poll(fds, userManager.getUserCount() + 1, -1);
-    } while (pollResult == -1 && errno == EINTR);
+	int pollResult;
+	do {
+		pollResult = poll(fds, userManager.getUserCount() + 1, -1);
+	} while (pollResult == -1 && errno == EINTR);
 
-    if(pollResult == -1)
-        throw IRCError("Failed to poll sockets");
+	if(pollResult == -1)
+	{
+		delete[] fds;
+		throw IRCError("Failed to poll sockets");
+	}
 
-    userManager.setPollFdsWithServerSocket(socket_, fds);
+	userManager.setPollFdsWithServerSocket(socket_, fds);
 
-    delete[] fds;
+	delete[] fds;
 }
 
 void Server::listenForNewClients(void)
