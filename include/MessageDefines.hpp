@@ -9,6 +9,7 @@
 # define NICK_CHANGED(user, nickname) ( ":" + user.getUserIdent() + " NICK :" + nickname)
 # define USER_CHANGED(user, username, hostname, servername, realname) ( ":" + user.getUserIdent() + " USER " + username + " " + hostname + " " + servername + " :" + realname)
 # define JOIN_CHANNEL(user, channelName) ( ":" + user.getUserIdent() + " JOIN " + channelName)
+# define JOIN_CHANNEL_SEND_TOPIC(user, channel) ( ":" + std::string(SERVER_NAME) + " 332 " + user.getNickname() + " " + channel.getName() + " :" + channel.getTopic())
 # define JOIN_CHANNEL_SEND_LIST(user, channelName, list) ( ":" + std::string(SERVER_NAME) + " 353 " + user.getNickname() + " = " + channelName + " :" + list)
 # define JOIN_CHANNEL_SEND_LIST_END(user, channelName) ( ":" + std::string(SERVER_NAME) + " 366 " + user.getNickname() + " " + channelName + " :End of NAMES list")
 # define PART_CHANNEL(user, channelName, comment) ( ":" + user.getUserIdent() + " PART " + channelName + " :" + comment)

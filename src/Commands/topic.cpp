@@ -25,6 +25,7 @@ std::string Command::topic(User &user, const Message &message)
 	if(channel.isTopicRestricted() && !channel.isUserOp(user))
 		return (ERR_USER_NOT_OPERATOR(user, channelName));
 
+	channel.setTopic(message.getTrailing());
 	channel.sendMessage(TOPIC_CHANGED(user, channelName, message.getTrailing()));
 
 	return ("");

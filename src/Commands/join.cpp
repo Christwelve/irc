@@ -41,6 +41,7 @@ std::string Command::join(User &user, const Message &message)
 			target.queue(JOIN_CHANNEL(user, channelName));
 		}
 
+		user.queue(JOIN_CHANNEL_SEND_TOPIC(user, channel));
 		user.queue(JOIN_CHANNEL_SEND_LIST(user, channelName, channel.getUserList()));
 		user.queue(JOIN_CHANNEL_SEND_LIST_END(user, channelName));
 	}
