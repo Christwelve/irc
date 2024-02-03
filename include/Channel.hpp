@@ -73,6 +73,7 @@ class Channel
 		bool isUserInvited(const User &user) const;
 		std::string getUserList(void) const;
 		bool hasOperator(void) const;
+		void handleUserLeave(const User &user);
 };
 
 

@@ -47,6 +47,16 @@ Channel &ChannelManager::getChannelByName(const std::string &name)
 	return channels_.at(name);
 }
 
+std::vector<std::string> ChannelManager::getChannelNames(void)
+{
+	std::vector<std::string> names;
+
+	for(std::map<std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); it++)
+		names.push_back(it->first);
+
+	return (names);
+}
+
 void ChannelManager::removeChannel(const Channel &channel)
 {
     channels_.erase(channel.getName());
@@ -64,9 +74,12 @@ void ChannelManager::removeUserFromChannel(Channel &channel, const User &user)
 
 void ChannelManager::removeUserFromAllChannels(const User &user, const std::string &quitMessage)
 {
-	for (std::map<std::string, Channel>::iterator it = channels_.begin(); it != channels_.end(); ++it)
+	std::vector<std::string> channelNames = getChannelNames();
+
+	for(unsigned long i = 0; i < channelNames.size(); i++)
 	{
-		Channel &channel = it->second;
+		std::string &channelName = channelNames.at(i);
+		Channel &channel = getChannelByName(channelName);
 
 		if(!channel.hasUser(user))
 			continue;

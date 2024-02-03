@@ -1,5 +1,6 @@
 #include "Channel.hpp"
 #include "UserManager.hpp"
+#include "ChannelManager.hpp"
 #include "MessageDefines.hpp"
 #include <algorithm>
 
@@ -55,9 +56,11 @@ void Channel::removeUser(const User &user)
 		if (users_.at(i) == user)
 		{
 			users_.erase(users_.begin() + i);
-			return;
+			break;
 		}
 	}
+
+	handleUserLeave(user);
 }
 
 void Channel::removeOperator(const User &user)
@@ -188,4 +191,17 @@ std::string Channel::getUserList(void) const
 bool Channel::hasOperator(void) const
 {
 	return (operators_.size() > 0);
+}
+
+void Channel::handleUserLeave(const User &user)
+{
+	if(isEmpty())
+		ChannelManager::getInstance().removeChannel(*this);
+	else if (!hasOperator())
+	{
+		User &newOp = UserManager::getInstance().getUserByNickname(getUsers().at(0).getNickname());
+
+		addOperator(newOp);
+		sendMessage(MODE_SET_OPERATOR(user, name_, "+o", newOp.getNickname()));
+	}
 }
