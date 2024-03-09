@@ -3,15 +3,15 @@
 
 # IRC Server
 
-<p align="center">
-  <img src="./media/weechat.png" alt="Chat">
-</p>
-
 ## Description
 This IRC Server is a high-performance Internet Relay Chat server designed for scalability and extensibility. Built with a focus on security and ease of use, it provides a robust platform for real-time communication across various communities.
 
 ## User Story
 As an administrator of a large online community, I need a reliable and customizable IRC server to facilitate seamless communication among members, manage channels efficiently, and ensure data security.
+
+<p align="center">
+  <img src="./media/weechat.png" alt="Chat">
+</p>
 
 ## Example Scenarios
 - An administrator sets up the IRC Server to support a growing online gaming community, utilizing its advanced features to create a dynamic and engaging environment.
@@ -73,7 +73,7 @@ Christian Meng (https://github.com/Christwelve)
 ---
 
 
-# Client -> Server communication
+## Client -> Server communication
 
 QUIT :<quit message>
 
@@ -100,7 +100,7 @@ LIST
 MODE <#channelname>/<nickname> <mode>
 
 
-# Server -> Client communication
+## Server -> Client communication
 
 QUIT 	->		(to all other users of a channel): :Nickname!Username@hostname QUIT :Quit: quit message
 
