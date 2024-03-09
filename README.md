@@ -1,43 +1,76 @@
 # :eye: :registered: :ocean:
 
 
+# IRC Server
+
+<p align="center">
+  <img src="./media/weechat.png" alt="Chat">
+</p>
+
+## Description
+This IRC Server is a high-performance Internet Relay Chat server designed for scalability and extensibility. Built with a focus on security and ease of use, it provides a robust platform for real-time communication across various communities.
+
+## User Story
+As an administrator of a large online community, I need a reliable and customizable IRC server to facilitate seamless communication among members, manage channels efficiently, and ensure data security.
+
+## Example Scenarios
+- An administrator sets up the IRC Server to support a growing online gaming community, utilizing its advanced features to create a dynamic and engaging environment.
+- A tech conference uses the IRC Server to provide real-time chat rooms for attendees, enabling discussions, Q&A sessions, and networking opportunities.
+
+## Getting Started
+Please refer to the `Getting started` link for instructions on setting up the IRC Server.
+
+## Prerequisites
+- Dependencies and environmental requirements will be listed here.
+
+## Installation Server
+
+```
+cd irc
+make
+```
+
+## Installation Client (Mac)
+
+```
+brew install weechat
+```
+
+## Usage Server
+
+```
+./ircserv <port> <password>
+```
+Connect to the server using your favorite IRC client at the specified port.
+
+## Usage Client
+
+```
 /server add <server.name> <server.ip>/6667 -notls -nosslwee
 
 Turn off debugging messages:
 /set weechat.network.gnutls_log_level 1
+```
 
+## Contributing
+We welcome contributions. Please read `CONTRIBUTING.md` for details on our code of conduct and the process for submitting pull requests to us.
 
-# Commands
+## License
+This project is licensed under the MIT License - see the `LICENSE.md` file for details.
 
-CAP -> ignore
+## Acknowledgments
+- Inspired by the resilience and adaptability of the the creature, this project aims to provide a similarly robust and flexible platform for online communication.
 
-QUIT -> rm socket(fd), rm user from channels / delete channels, rm user from user.map, close socket
+## Links / Further Information
+- [GitHub Repository Link]
+- [Documentation]
+- [User Guide]
 
-USER -> addNewUser, User-, Real-, Nickname,
+## Contributors 
+Gero Böhm (https://github.com/gero-boehm)  
+Christian Meng (https://github.com/Christwelve)  
 
-JOIN -> addUser to channel / create channel
-
-PART ->	leave a channel
-
-PRIVMSG -> send message publicly or privatly
-
-KICK -> (depending on own role) remove user from channel
-
-INVITE -> add user to channel
-
-TOPIC -> shows current topic, /topic <new_topic> replaces current topic
-
-LIST -> shows a list of all channels
-
-MODE -> shows current mode
-
- -i set/unset invite only
-
- -t set/unset /topic cmd
-
- -k set/unset channel key
-
- -o set/unset operator priviledge
+---
 
 
 # Client -> Server communication
@@ -101,39 +134,11 @@ MODE 	->		:Nick!User@host MODE #channelname :<mode>
 
 
 
-
-:server 421 client :Unknown command
-001: Welcome message sent after a successful connection.
-002: Server's version information.
-003: Server's creation date.
-004: Server's details (name, version, available user modes, available channel modes).
-005: Additional server features.
-353: Reply to the NAMES command, listing all visible users in a channel.
-366: End of NAMES list.
-372: MOTD (Message of the Day) text line.
-375: Start of MOTD.
-376: End of MOTD.
-421: Unknown command.
-433: Nickname is already in use.
-441: User not in channel (used when trying to kick a user not in channel).
-442: Not on channel (used when trying to perform a channel operation without being on the channel).
-461: Need more parameters (used when a command needs more parameters).
-462: Already registered (used when a client tries to register again).
-464: Incorrect password.
-465: You are banned from this server.
-471: Channel is full.
-473: Invite only channel.
-474: Banned from channel.
-475: Bad channel key.
-
-
 >client 4: NICK cmeng
 >
 >client 4: USER cmeng 0 * :cmeng
 >
 >USER <username> <hostname> <servername> :<realname>
 >
->In your example, client 4: USER cmeng 0 * :cmeng, the 0 and * are placeholders for the hostname and servername.
-The 0 is a mode mask, often used to set user modes upon registration. In many IRC daemons, this field is ignored, but it's still part of the protocol. The 0 means no special modes are set.
-The * is a wildcard. It's used here because the hostname and servername are typically provided by the server, not the client. The * indicates that any servername can be used.
-So, in this case, the command is setting the username and realname to cmeng, with no specific hostname or servername.
+
+
